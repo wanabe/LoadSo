@@ -6,8 +6,7 @@ ExtRgss ‚ÍARPGƒcƒN[ƒ‹‚ÌƒQ[ƒ€ƒGƒ“ƒWƒ“‚ð‚‘¬‰»‚·‚é‚±‚Æ‚ð–Ú“I‚Æ‚µ‚½ƒvƒƒWƒFƒNƒg‚
 uRPGƒcƒN[ƒ‹v‚ÍAŠ”Ž®‰ïŽÐƒAƒXƒL[A‚¨‚æ‚ÑŠ”Ž®‰ïŽÐƒGƒ“ƒ^[ƒuƒŒƒCƒ“‚Ì“o˜^¤•W‚Å‚·B
 
 * Žg—p•û–@
-‚Ü‚¸ ext_rgss.dll ‚ð Game.exe ‚Æ“¯‚¶ƒfƒBƒŒƒNƒgƒŠ‚©A‚Ü‚½‚Í‚»‚Ì’†‚Ì
-System ƒfƒBƒŒƒNƒgƒŠiRGSS300.dll ‚Ì‚ ‚éŠj‚É’u‚¢‚Ä‚­‚¾‚³‚¢B
+‚Ü‚¸ ext_rgss.dll ‚ð Game.exe ‚Æ“¯‚¶ƒfƒBƒŒƒNƒgƒŠ‚É’u‚¢‚Ä‚­‚¾‚³‚¢B
 ŽŸ‚ÉƒcƒN[ƒ‹‚ÌƒXƒNƒŠƒvƒgƒGƒfƒBƒ^æ“ª‚É ext_rgss.rb ‚ð’£‚è•t‚¯‚Ä‚­‚¾‚³‚¢B
 ‚Ü‚½‚Í require ‚â load ‚Å“Ç‚Ýž‚Þ‚æ‚¤‚É‚µ‚Ä‚à\‚¢‚Ü‚¹‚ñB
 •K‚¸‘¼‚ÌƒXƒNƒŠƒvƒg‚æ‚èæ‚É“Ç‚Ýž‚Þ‚æ‚¤‚É‚µ‚Ä‚­‚¾‚³‚¢B
