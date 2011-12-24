@@ -4,7 +4,7 @@ LIBDIRS=
 LDFLAGS=-shared -o $(OUT) $(LIBDIRS)
 OUT=ext_rgss.dll
 OBJS=ext_rgss.o
-LIBS=
+LIBS=-ld3d9 -lole32
 GAME=./Game.exe
 HEADERS=
 
