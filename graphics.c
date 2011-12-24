@@ -1,7 +1,22 @@
 #include "ext_rgss.h"
 #include "d3d9.h"
 
+#define FVF_VERTEX   (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
+typedef struct
+{
+  float x, y, z;
+  float rhw;
+  D3DCOLOR diffuse;
+  float u, v;
+} VERTEX;
 LPDIRECT3DDEVICE9 pD3DDevice;
+
+VERTEX vtx[]=
+{
+  {      0,       0,     0,  1.0, 0xff00ff00,0.5f,0.0f  },
+  {    544,       0,     0,  1.0, 0xff0000ff,0.0f,0.0f  },
+  {      0,     416,     0,  1.0, 0xffffffff,0.5f,1.0f  },
+};
 
 struct hWndFinder {
   HWND hWnd;
@@ -45,7 +60,12 @@ static VALUE Graphics_s_init(VALUE self) {
 }
 
 static VALUE Graphics_s_update(VALUE self) {
-  pD3DDevice->lpVtbl->Clear(pD3DDevice, 0, NULL, (D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(255,255,255,255), 1.0f, 0);
+  pD3DDevice->lpVtbl->Clear(pD3DDevice, 0, NULL, (D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0,0,0,0), 1.0f, 0);
+  pD3DDevice->lpVtbl->SetFVF(pD3DDevice, FVF_VERTEX);
+  if(SUCCEEDED(pD3DDevice->lpVtbl->BeginScene(pD3DDevice))) {
+    pD3DDevice->lpVtbl->DrawPrimitiveUP(pD3DDevice, D3DPT_TRIANGLESTRIP,1,vtx,sizeof(VERTEX));
+    pD3DDevice->lpVtbl->EndScene(pD3DDevice);
+  }
   pD3DDevice->lpVtbl->Present(pD3DDevice, NULL,NULL,NULL,NULL);
   return Qnil;
 }
