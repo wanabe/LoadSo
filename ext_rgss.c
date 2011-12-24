@@ -38,6 +38,7 @@ static cfunc get_global_func(char *name) {
 int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
+  LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
   TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
   rb_obj_method = method->me.def->body.cfunc.func;
   rb_f_raise = get_global_func("raise");
