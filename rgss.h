@@ -134,4 +134,4 @@ struct METHOD {
     rb_method_entry_t me;
 };
 
-extern VALUE rb_cObject;
+extern VALUE rb_cObject, rb_eRuntimeError;

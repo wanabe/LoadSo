@@ -29,17 +29,18 @@ static VALUE Graphics_s_init(VALUE self) {
 
   finder.pId = GetCurrentProcessId();
   EnumWindows(EnumWindowsProc, (LPARAM)&finder);
-  if(FAILED(CoInitialize(NULL))) {
-    return 0;
-  }
   if((pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == NULL) {
-    return 0;
+    rb_raise(rb_eRuntimeError, "Direct3DCreate9 failed");
   }
 
   hr = pD3D->lpVtbl->CreateDevice(pD3D, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, finder.hWnd,
                                   D3DCREATE_HARDWARE_VERTEXPROCESSING, &D3DPP, &pD3DDevice);
   if(FAILED(hr)) {
-    return 0;
+    hr = pD3D->lpVtbl->CreateDevice(pD3D, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, finder.hWnd,
+                                    D3DCREATE_SOFTWARE_VERTEXPROCESSING, &D3DPP, &pD3DDevice);
+    if(FAILED(hr)) {
+      rb_raise(rb_eRuntimeError, "IDirect3D9::CreateDevice failed");
+    }
   }
 }
 
