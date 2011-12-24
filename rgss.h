@@ -133,3 +133,5 @@ struct METHOD {
     ID id;
     rb_method_entry_t me;
 };
+
+extern VALUE rb_cObject;
