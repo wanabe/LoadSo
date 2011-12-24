@@ -20,21 +20,24 @@ struct RString buf_string = {0x2005, 0};
 VALUE value_buf_string = (VALUE)&buf_string;
 typedef VALUE (*cfunc)(ANYARGS);
 
-static cfunc get_global_func(char *name) {
+static cfunc get_method(VALUE obj, char *name) {
   VALUE vmethod;
   struct METHOD *method;
 
   buf_string.as.heap.ptr = name;
   buf_string.as.heap.len = strlen(name);
-  vmethod = rb_obj_method(Qnil, value_buf_string);
+  vmethod = rb_obj_method(obj, value_buf_string);
   TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
   return method->me.def->body.cfunc.func;
 }
 
-int Init_ext_rgss(VALUE vmethod) {
+static cfunc get_global_func(char *name) {
+  return get_method(Qnil, name);
+}
+
+int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
-  static char *hoge = "raise";
-  
+
   TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
   rb_obj_method = method->me.def->body.cfunc.func;
   rb_f_raise = get_global_func("raise");
