@@ -7,13 +7,32 @@
 #else
 #define ANYARGS
 #endif
+#define RSHIFT(x,y) ((x)>>(int)(y))
 
 typedef unsigned long VALUE;
 typedef unsigned long ID;
 
-#define Qfalse ((VALUE)0)
-#define Qtrue  ((VALUE)2)
-#define Qnil   ((VALUE)4)
+enum ruby_special_consts {
+    RUBY_Qfalse = 0,
+    RUBY_Qtrue  = 2,
+    RUBY_Qnil   = 4,
+    RUBY_Qundef = 6,
+
+    RUBY_IMMEDIATE_MASK = 0x03,
+    RUBY_FIXNUM_FLAG    = 0x01,
+    RUBY_SYMBOL_FLAG    = 0x0e,
+    RUBY_SPECIAL_SHIFT  = 8
+};
+#define Qfalse ((VALUE)RUBY_Qfalse)
+#define Qtrue  ((VALUE)RUBY_Qtrue)
+#define Qnil   ((VALUE)RUBY_Qnil)
+#define Qundef ((VALUE)RUBY_Qundef)	/* undefined value for placeholder */
+#define IMMEDIATE_MASK RUBY_IMMEDIATE_MASK
+#define FIXNUM_FLAG RUBY_FIXNUM_FLAG
+#define SYMBOL_FLAG RUBY_SYMBOL_FLAG
+
+#define ID2SYM(x) (((VALUE)(x)<<RUBY_SPECIAL_SHIFT)|SYMBOL_FLAG)
+#define SYM2ID(x) RSHIFT((unsigned long)(x),RUBY_SPECIAL_SHIFT)
 
 struct RBasic {
     VALUE flags;
