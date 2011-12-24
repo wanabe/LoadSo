@@ -14,12 +14,32 @@ static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lp) {
   return TRUE;
 }
 
-int Init_ext_rgss() {
-  RECT rect;
+VALUE (*rb_obj_method)(VALUE obj, VALUE vid);
+VALUE (*rb_f_raise)(int argc, VALUE *argv);
+struct RString buf_string = {0x2005, 0};
+VALUE value_buf_string = (VALUE)&buf_string;
+typedef VALUE (*cfunc)(ANYARGS);
+
+static cfunc get_global_func(char *name) {
+  VALUE vmethod;
+  struct METHOD *method;
+
+  buf_string.as.heap.ptr = name;
+  buf_string.as.heap.len = strlen(name);
+  vmethod = rb_obj_method(Qnil, value_buf_string);
+  TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
+  return method->me.def->body.cfunc.func;
+}
+
+int Init_ext_rgss(VALUE vmethod) {
+  struct METHOD *method;
+  static char *hoge = "raise";
+  
+  TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
+  rb_obj_method = method->me.def->body.cfunc.func;
+  rb_f_raise = get_global_func("raise");
 
   EnumWindows(EnumWindowsProc, (LPARAM)GetCurrentProcessId());
-  GetWindowRect(hWndRgss, &rect);
-  printf("%d %d %d %d\n", rect.left, rect.top, rect.right, rect.bottom);
   {
     HRESULT hr;
     LPDIRECT3D9 pD3D;
