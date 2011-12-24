@@ -92,8 +92,14 @@ static VALUE Graphics_s_update(VALUE self) {
   return Qnil;
 }
 
+static VALUE Graphics_s_dummy() {
+}
 void Init_ExtGraphics() {
   VALUE mGraphics = rb_const_get(rb_cObject, rb_intern("Graphics"));
   rb_define_singleton_method(mGraphics, "init", Graphics_s_init, 0);
   rb_define_singleton_method(mGraphics, "update", Graphics_s_update, 0);
+  rb_define_singleton_method(mGraphics, "freeze", Graphics_s_dummy, 0);
+  rb_define_singleton_method(mGraphics, "transition", Graphics_s_dummy, -1);
+  rb_define_singleton_method(mGraphics, "fadein", Graphics_s_dummy, 1);
+  rb_define_singleton_method(mGraphics, "fadeout", Graphics_s_dummy, 1);
 }
