@@ -1,17 +1,23 @@
 float4x4 matWVP;
 
-float4 FirstVertexShader(float4 pos :POSITION) :POSITION {
-   return mul(pos, matWVP);
+struct FIRST_VS_OUTPUT {
+  float4 pos :POSITION;
+  float4 diffuse :COLOR0;
+};
+
+FIRST_VS_OUTPUT FirstVertexShader(float4 pos :POSITION, float4 diffuse :COLOR0) {
+  FIRST_VS_OUTPUT outVS;
+  outVS.pos = mul(pos, matWVP);
+  outVS.diffuse = diffuse;
+  return outVS;
 }
 float4 FirstPixelShader(float4 color :COLOR0) :COLOR0 {
-   return color;
+  return color;
 }
 
-technique ExtRgssTeq
-{
-   pass P0
-   {
-      VertexShader = compile vs_2_0 FirstVertexShader();
-      PixelShader = compile ps_2_0 FirstPixelShader();
-   }
+technique ExtRgssTec {
+  pass P0 {
+    VertexShader = compile vs_2_0 FirstVertexShader();
+    PixelShader = compile ps_2_0 FirstPixelShader();
+  }
 }
