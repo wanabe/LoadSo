@@ -7,6 +7,8 @@ Game.exe
 Game.ini
 Game.rvproj2
 
+d3dx9.lib
+
 hoge.*
 *.o
 *.dll

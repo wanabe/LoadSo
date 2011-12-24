@@ -1,5 +1,6 @@
 #include "ext_rgss.h"
 #include "d3d9.h"
+#include "d3dx9.h"
 
 #define FVF_VERTEX   (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 typedef struct
@@ -9,7 +10,9 @@ typedef struct
   D3DCOLOR diffuse;
   float u, v;
 } VERTEX;
+
 LPDIRECT3DDEVICE9 pD3DDevice;
+LPD3DXEFFECT pEffect;
 
 VERTEX vtx[]=
 {
@@ -41,6 +44,7 @@ static VALUE Graphics_s_init(VALUE self) {
     D3DSWAPEFFECT_DISCARD,NULL,TRUE,TRUE,D3DFMT_D24S8,D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL,
     D3DPRESENT_RATE_DEFAULT,D3DPRESENT_INTERVAL_DEFAULT};
   struct hWndFinder finder;
+  ID3DXBuffer *pErrorMsgs;
 
   finder.pId = GetCurrentProcessId();
   EnumWindows(EnumWindowsProc, (LPARAM)&finder);
@@ -56,6 +60,12 @@ static VALUE Graphics_s_init(VALUE self) {
     if(FAILED(hr)) {
       rb_raise(rb_eRuntimeError, "IDirect3D9::CreateDevice failed");
     }
+  }
+
+  hr = D3DXCreateEffectFromFile(
+    pD3DDevice, "ext_rgss.fx", NULL, NULL, 0, NULL, &pEffect, &pErrorMsgs);
+  if(FAILED(hr)) {
+    rb_raise(rb_eRuntimeError, "Can't load effect file");
   }
 }
 
