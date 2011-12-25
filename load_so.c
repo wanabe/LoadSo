@@ -232,6 +232,11 @@ void rb_global_variable(VALUE *var) {
   rb_ary_push(global_list, *var);
 }
 
+int WINAPI rb_w32_Sleep(unsigned long msec) {
+  Sleep(msec);
+  return msec;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 

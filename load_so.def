@@ -1,0 +1,3 @@
+LIBRARY msvcrt-ruby191.dll
+EXPORTS
+Sleep@4=rb_w32_Sleep@4
