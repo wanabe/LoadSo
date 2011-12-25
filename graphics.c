@@ -94,6 +94,7 @@ static VALUE Graphics_s_update(VALUE self) {
 
 static VALUE Graphics_s_dummy() {
 }
+
 void Init_ExtGraphics() {
   VALUE mOldGraphics = rb_const_get(rb_cObject, rb_intern("Graphics"));
   VALUE mGraphics = rb_define_module_under(mExtRgss, "Graphics");

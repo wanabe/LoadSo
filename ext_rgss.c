@@ -36,15 +36,19 @@ inline cfunc get_method_with_func(cfunc func, VALUE obj, char *name) {
 static cfunc get_method(VALUE obj, char *name) {
   return get_method_with_func(rb_obj_method, obj, name);
 }
+
 static cfunc get_global_func(char *name) {
   return get_method_with_func(rb_obj_method, Qnil, name);
 }
+
 static cfunc get_instance_method(VALUE mod, char *name) {
   return get_method_with_func(rb_mod_instance_method, mod, name);
 }
+
 void rb_p(VALUE obj) {
   rb_f_p(1, &obj, Qnil);
 }
+
 void rb_define_singleton_method(VALUE obj, char *name, VALUE (*func)(ANYARGS), int argc) {
   VALUE klass, vmethod;
   struct METHOD *method;
@@ -59,18 +63,22 @@ void rb_define_singleton_method(VALUE obj, char *name, VALUE (*func)(ANYARGS), i
   method->me.def->body.cfunc.func = func;
   method->me.def->body.cfunc.argc = argc;
 }
+
 ID rb_intern(const char *name) {
   set_buf_string(name);
   return SYM2ID(rb_str_intern(value_buf_string));
 }
+
 VALUE rb_const_get(VALUE klass, ID id) {
   VALUE sym = ID2SYM(id);
   return rb_mod_const_get(1, &sym, klass);
 }
+
 void rb_const_set(VALUE klass, ID id, VALUE val) {
   VALUE sym = ID2SYM(id);
   rb_mod_const_set(klass, sym, val);
 }
+
 void rb_raise(VALUE exc, const char *msg,...) {
   VALUE v[2] = {exc, value_buf_string};
 
@@ -78,14 +86,17 @@ void rb_raise(VALUE exc, const char *msg,...) {
   set_buf_string(msg);
   rb_f_raise(2, v);
 }
+
 VALUE rb_define_module_under(VALUE outer, const char *name) {
   VALUE mod = rb_class_new_instance(0, NULL, rb_cModule);
   rb_const_set(outer, rb_intern(name), mod);
   return mod;
 }
+
 VALUE rb_define_module(const char *name) {
   return rb_define_module_under(rb_cObject, name);
 }
+
 int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
   VALUE mGraphics;
