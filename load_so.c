@@ -17,13 +17,14 @@ VALUE (*rb_str_plus)(VALUE, VALUE);
 VALUE (*rb_f_eval)(int, VALUE*, VALUE);
 VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
 VALUE (*rb_mod_append_features)(VALUE, VALUE);
+VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cString, rb_eRuntimeError, rb_eLoadError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_eRuntimeError, rb_eLoadError;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -205,6 +206,10 @@ void rb_set_end_proc(void (*func)(VALUE), VALUE data) {
   fprintf(stderr, "TODO: rb_set_end_proc is unable yet");
 }
 
+VALUE rb_ary_push(VALUE ary, VALUE item) {
+  return rb_ary_push_m(1, &item, ary);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -262,6 +267,9 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   /* rb_define_class */
 
   rb_mod_append_features = get_instance_method(rb_cModule, "append_features");
+
+  rb_cArray = rb_const_get(rb_cObject, rb_intern("Array"));
+  rb_ary_push_m = get_instance_method(rb_cArray, "push");
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_define_global_function("load_so", load_so, 2);
