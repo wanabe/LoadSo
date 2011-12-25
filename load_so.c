@@ -152,6 +152,17 @@ VALUE rb_define_module(const char *name) {
   return rb_define_module_under(rb_cObject, name);
 }
 
+VALUE rb_data_object_alloc(VALUE klass, void *datap, RUBY_DATA_FUNC dmark, RUBY_DATA_FUNC dfree) {
+  struct RData *data = (struct RData*)rb_class_new_instance(0, NULL, rb_cObject);
+  data->basic.klass = klass;
+  data->basic.flags = T_DATA;
+  data->data = datap;
+  data->dfree = dfree;
+  data->dmark = dmark;
+
+  return (VALUE)data;
+}
+
 static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
   void (*init_func)();
   HMODULE hSo;
