@@ -62,6 +62,29 @@ struct RData {
     void *data;
 };
 #define DATA_PTR(dta) (RDATA(dta)->data)
+typedef struct rb_data_type_struct rb_data_type_t;
+struct rb_data_type_struct {
+    const char *wrap_struct_name;
+    struct {
+	void (*dmark)(void*);
+	void (*dfree)(void*);
+	size_t (*dsize)(const void *);
+	void *reserved[2]; /* For future extension.
+			      This array *must* be filled with ZERO. */
+    } function;
+    const rb_data_type_t *parent;
+    void *data;        /* This area can be used for any purpose
+                          by a programmer who define the type. */
+};
+struct RTypedData {
+    struct RBasic basic;
+    const rb_data_type_t *type;
+    VALUE typed_flag; /* 1 or not */
+    void *data;
+};
+#define RTYPEDDATA_P(v)    (RTYPEDDATA(v)->typed_flag == 1)
+#define RTYPEDDATA_TYPE(v) (RTYPEDDATA(v)->type)
+#define RTYPEDDATA_DATA(v) (RTYPEDDATA(v)->data)
 
 #define TypedData_Get_Struct(obj,type,data_type,sval) do {\
   (sval) = (type*)DATA_PTR(obj);\
@@ -70,6 +93,7 @@ struct RData {
 #define R_CAST(st)      (struct st*)
 #define RBASIC(obj)     (R_CAST(RBasic)(obj))
 #define RDATA(obj)      (R_CAST(RData)(obj))
+#define RTYPEDDATA(obj) (R_CAST(RTypedData)(obj))
 
 typedef enum {
     NOEX_PUBLIC    = 0x00,

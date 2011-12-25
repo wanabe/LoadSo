@@ -19,27 +19,24 @@ static void set_buf_string(const char *str) {
   buf_string.as.heap.len = strlen(str);
 }
 
-static cfunc get_method(VALUE obj, char *name) {
+inline cfunc get_method_with_func(cfunc func, VALUE obj, char *name) {
   VALUE vmethod;
   struct METHOD *method;
 
   set_buf_string(name);
-  vmethod = rb_obj_method(obj, value_buf_string);
-  TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
+  vmethod = func(obj, value_buf_string);
+  method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
   return method->me.def->body.cfunc.func;
 }
 
+static cfunc get_method(VALUE obj, char *name) {
+  return get_method_with_func(rb_obj_method, obj, name);
+}
 static cfunc get_global_func(char *name) {
-  return get_method(Qnil, name);
+  return get_method_with_func(rb_obj_method, Qnil, name);
 }
 static cfunc get_instance_method(VALUE mod, char *name) {
-  VALUE vmethod;
-  struct METHOD *method;
-
-  set_buf_string(name);
-  vmethod = rb_mod_instance_method(mod, value_buf_string);
-  TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
-  return method->me.def->body.cfunc.func;
+  return get_method_with_func(rb_mod_instance_method, mod, name);
 }
 void rb_define_singleton_method(VALUE obj, char *name, VALUE (*func)(ANYARGS), int argc) {
   VALUE klass, vmethod;
@@ -50,7 +47,7 @@ void rb_define_singleton_method(VALUE obj, char *name, VALUE (*func)(ANYARGS), i
   rb_mod_attr_reader(1, &value_buf_string, klass);
   rb_mod_public(1, &value_buf_string, klass);
   vmethod = rb_obj_method(obj, value_buf_string);
-  TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
+  method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
   method->me.def->type = VM_METHOD_TYPE_CFUNC;
   method->me.def->body.cfunc.func = func;
   method->me.def->body.cfunc.argc = argc;
@@ -63,9 +60,10 @@ VALUE rb_const_get(VALUE klass, ID id) {
   VALUE sym = ID2SYM(id);
   return rb_mod_const_get(1, &sym, klass);
 }
-/* TODO: rb_raise can take more args */
-void rb_raise(VALUE exc, const char *msg) {
+void rb_raise(VALUE exc, const char *msg,...) {
   VALUE v[2] = {exc, value_buf_string};
+
+  /* TODO: va_args */
   set_buf_string(msg);
   rb_f_raise(2, v);
 }
@@ -75,7 +73,7 @@ int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
 
   LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
   rb_cObject = cObject;
-  TypedData_Get_Struct(vmethod, struct METHOD, NULL, method);
+  method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
   rb_obj_method = method->me.def->body.cfunc.func;
   rb_mod_const_get = get_method(cObject, "const_get");
   rb_obj_singleton_class = get_global_func("singleton_class");
