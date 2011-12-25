@@ -25,7 +25,7 @@ VALUE dummy_proc;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_eRuntimeError, rb_eLoadError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -285,6 +285,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_eRuntimeError = rb_const_get(rb_cObject, rb_intern("RuntimeError"));
   rb_eLoadError = rb_const_get(rb_cObject, rb_intern("LoadError"));
+  rb_eTypeError = rb_const_get(rb_cObject, rb_intern("TypeError"));
+  rb_eArgError = rb_const_get(rb_cObject, rb_intern("ArgumentError"));
 
   rb_class_new_instance = get_method(rb_cObject, "new");
   rb_cModule = rb_const_get(rb_cObject, rb_intern("Module"));
@@ -297,6 +299,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_cArray = rb_const_get(rb_cObject, rb_intern("Array"));
   rb_ary_push_m = get_instance_method(rb_cArray, "push");
+
+  rb_cProc = rb_const_get(rb_cObject, rb_intern("Proc"));
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_define_global_function("load_so", load_so, 2);
