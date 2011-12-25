@@ -5,16 +5,19 @@ VALUE (*rb_f_raise)(int, VALUE*);
 VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
 VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
 VALUE (*rb_obj_singleton_class)(VALUE);
-VALUE (*rb_mod_attr_reader)(int, VALUE*, VALUE);
 VALUE (*rb_mod_public)(int, VALUE*, VALUE);
 VALUE (*rb_mod_private)(int, VALUE*, VALUE);
 VALUE (*rb_str_intern)(VALUE);
 VALUE (*rb_mod_instance_method)(VALUE, VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
-VALUE (*rb_f_p)(int argc, VALUE *argv, VALUE self);
+VALUE (*rb_f_p)(int, VALUE*, VALUE);
 VALUE (*rb_str_plus)(VALUE, VALUE);
+VALUE (*rb_f_eval)(int, VALUE*, VALUE);
+VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
+VALUE dummy_proc;
+
 typedef VALUE (*cfunc)(ANYARGS);
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cString, rb_eRuntimeError, rb_eLoadError;
@@ -51,11 +54,11 @@ void rb_p(VALUE obj) {
 }
 
 void rb_define_method(VALUE klass, const char *name, VALUE (*func)(ANYARGS), int argc) {
-  VALUE vmethod;
+  VALUE vmethod, v[2] = {value_buf_string, dummy_proc};
   struct METHOD *method;
 
   set_buf_string(name);
-  rb_mod_attr_reader(1, &value_buf_string, klass);
+  rb_mod_define_method(2, v, klass);
   vmethod = rb_mod_instance_method(klass, value_buf_string);
   method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
   method->me.def->type = VM_METHOD_TYPE_CFUNC;
@@ -115,7 +118,7 @@ VALUE rb_define_module(const char *name) {
   return rb_define_module_under(rb_cObject, name);
 }
 
-VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
+static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
   void (*init_func)();
   HMODULE hSo;
 
@@ -135,6 +138,11 @@ VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
   }
   init_func();
   return Qnil;
+}
+
+VALUE rb_eval_string(const char *str) {
+  set_buf_string(str);
+  return rb_f_eval(1, &value_buf_string, Qnil);
 }
 
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
@@ -162,7 +170,11 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_mod_const_set = get_method(rb_cObject, "const_set");
   /* rb_const_set */
 
-  rb_mod_attr_reader = get_method(rb_cObject, "attr_reader");
+  rb_f_eval = get_global_func("eval");
+  /* rb_eval_string */
+
+  dummy_proc = rb_eval_string("proc{}");
+  rb_mod_define_method = get_method(rb_cObject, "define_method");
   rb_mod_public = get_method(rb_cObject, "public");
   /* rb_define_method */
 
