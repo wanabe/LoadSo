@@ -235,6 +235,17 @@ void rb_global_variable(VALUE *var) {
   rb_ary_push(global_list, *var);
 }
 
+VALUE rb_ary_entry(VALUE ary, long offset) {
+  if(offset < 0) {
+    offset += RARRAY_LEN(ary);
+  }
+  if(offset < 0 || offset >= RARRAY_LEN(ary)) {
+    return Qnil;
+  }
+
+  return RARRAY_PTR(ary)[offset];
+}
+
 VALUE rb_yield(VALUE val) {
   VALUE proc = rb_proc_s_new(0, NULL, rb_cProc);
   return proc_call(1, &val, proc);
@@ -251,6 +262,20 @@ VALUE rb_block_proc() {
 
 int rb_block_given_p() {
   return RTEST(rb_f_block_given_p());
+}
+
+VALUE rb_ary_new() {
+  return rb_class_new_instance(0, NULL, rb_cArray);
+}
+
+VALUE rb_ary_new4(long n, const VALUE *elts) {
+  VALUE ary = INT2FIX(n);
+
+  ary = rb_class_new_instance(1, &ary, rb_cArray);
+  if (n > 0 && elts) {
+    memcpy(RARRAY_PTR(ary), elts, sizeof(VALUE) * n);
+  }
+  return ary;
 }
 
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {

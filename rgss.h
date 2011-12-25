@@ -178,6 +178,13 @@ struct RArray {
     } as;
 };
 #define RARRAY_EMBED_FLAG FL_USER1
+#define RARRAY_EMBED_LEN_MASK (FL_USER4|FL_USER3)
+#define RARRAY_EMBED_LEN_SHIFT (FL_USHIFT+3)
+#define RARRAY_LEN(a) \
+    ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
+     (long)((RBASIC(a)->flags >> RARRAY_EMBED_LEN_SHIFT) & \
+	 (RARRAY_EMBED_LEN_MASK >> RARRAY_EMBED_LEN_SHIFT)) : \
+     RARRAY(a)->as.heap.len)
 #define RARRAY_PTR(a) \
     ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
      RARRAY(a)->as.ary : \
