@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "load_so.h"
 #include "st.h"
 
@@ -187,6 +188,10 @@ VALUE rb_str_new_cstr(const char *ptr) {
 
 void rb_include_module(VALUE klass, VALUE module) {
   rb_mod_append_features(module, klass);
+}
+
+void rb_set_end_proc(void (*func)(VALUE), VALUE data) {
+  fprintf(stderr, "TODO: rb_set_end_proc is unable yet");
 }
 
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
