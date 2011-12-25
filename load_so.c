@@ -16,7 +16,6 @@ VALUE value_buf_string = (VALUE)&buf_string;
 typedef VALUE (*cfunc)(ANYARGS);
 
 VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
-VALUE mExtRgss;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -97,7 +96,7 @@ VALUE rb_define_module(const char *name) {
   return rb_define_module_under(rb_cObject, name);
 }
 
-int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
+int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
   LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
@@ -135,6 +134,5 @@ int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
   rb_cModule = rb_const_get(rb_cObject, rb_intern("Module"));
   /* rb_define_module */
 
-  mExtRgss = rb_define_module("ExtRgss");
   return 1;
 }
