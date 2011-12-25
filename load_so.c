@@ -266,7 +266,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_f_eval = get_global_func("eval");
   /* rb_eval_string */
 
-  dummy_proc = rb_eval_string("proc{}");
+  dummy_proc = rb_eval_string("$__loadso__dummy_proc = proc{}");
   rb_mod_define_method = get_method(rb_cObject, "define_method");
   rb_mod_public = get_method(rb_cObject, "public");
   /* rb_define_method */
