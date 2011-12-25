@@ -243,6 +243,20 @@ typedef void (*RUBY_DATA_FUNC)(void*);
 #define RRATIONAL(obj) (R_CAST(RRational)(obj))
 #define RCOMPLEX(obj) (R_CAST(RComplex)(obj))
 
+static inline int rb_type(VALUE obj) {
+  if (IMMEDIATE_P(obj)) {
+    if (FIXNUM_P(obj)) return T_FIXNUM;
+    if (obj == Qtrue) return T_TRUE;
+    if (SYMBOL_P(obj)) return T_SYMBOL;
+    if (obj == Qundef) return T_UNDEF;
+  } else if (!RTEST(obj)) {
+    if (obj == Qnil) return T_NIL;
+    if (obj == Qfalse) return T_FALSE;
+  }
+  return BUILTIN_TYPE(obj);
+}
+#define TYPE(x) rb_type((VALUE)(x))
+
 typedef enum {
     NOEX_PUBLIC    = 0x00,
     NOEX_NOSUPER   = 0x01,
@@ -305,6 +319,8 @@ struct METHOD {
     ID id;
     rb_method_entry_t me;
 };
+
+#define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
 
 extern VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
 void rb_raise(VALUE, const char*,...);
