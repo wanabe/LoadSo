@@ -2,7 +2,5 @@
 #include "rgss.h"
 
 #ifndef DLL_NAME
-#define DLL_NAME "ext_rgss.dll"
+#define DLL_NAME "msvcrt-ruby191.dll"
 #endif
-
-extern VALUE mExtRgss;

@@ -2,20 +2,14 @@ INCDIRS=
 LIBDIRS=
 
 LDFLAGS=$(LIBDIRS) -shared
-EXTDLL=ext_rgss.dll
-CFLAGS=-Wall -DDLL_NAME="\"$(EXTDLL)\""
-OBJS=ext_rgss.o graphics.o
-LIBS=d3dx9.lib -ld3d9 -lole32
-GAME=./Game.exe
-HEADERS=ext_rgss.h rgss.h
+DLL=msvcrt-ruby191.dll
+CFLAGS=-Wall -DDLL_NAME="\"$(DLL)\""
+OBJS=load_so.o
+LIBS=
 
-all: $(EXTDLL)
+all: $(DLL)
 
-test: all
-	$(GAME)
+$(DLL): $(OBJS)
+	$(CC) $(LDFLAGS) -o $(DLL) $(OBJS) $(LIBS)
 
-$(EXTDLL): $(OBJS)
-	$(CC) $(LDFLAGS) -o $(EXTDLL) $(OBJS) $(LIBS)
-
-ext_rgss.o: rgss.h ext_rgss.h graphics.h
-graphics.o: rgss.h ext_rgss.h graphics.h
+load_so.o: rgss.h load_so.h

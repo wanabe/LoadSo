@@ -1,5 +1,4 @@
-#include "ext_rgss.h"
-#include "graphics.h"
+#include "load_so.h"
 
 VALUE (*rb_obj_method)(VALUE, VALUE);
 VALUE (*rb_f_raise)(int, VALUE*);
@@ -137,6 +136,5 @@ int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
   /* rb_define_module */
 
   mExtRgss = rb_define_module("ExtRgss");
-  Init_ExtGraphics();
   return 1;
 }
