@@ -177,6 +177,13 @@ VALUE rb_eval_string(const char *str) {
   return rb_f_eval(1, &value_buf_string, Qnil);
 }
 
+VALUE rb_str_new_cstr(const char *ptr) {
+  VALUE str = rb_class_new_instance(0, NULL, rb_cModule);
+  set_buf_string(ptr);
+  str = rb_str_plus(str, value_buf_string);
+  return str;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -196,6 +203,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_mod_const_get = get_method(rb_cObject, "const_get");
   set_buf_string("String");
   rb_cString = rb_mod_const_get(1, &value_buf_string, rb_cObject);
+  buf_string.basic.klass = rb_cString;
   rb_str_intern = get_instance_method(rb_cString, "intern");
   /* rb_intern, rb_const_get */
 
