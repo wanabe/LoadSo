@@ -15,6 +15,7 @@ VALUE (*rb_f_p)(int, VALUE*, VALUE);
 VALUE (*rb_str_plus)(VALUE, VALUE);
 VALUE (*rb_f_eval)(int, VALUE*, VALUE);
 VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
+VALUE (*rb_mod_append_features)(VALUE, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc;
@@ -184,6 +185,10 @@ VALUE rb_str_new_cstr(const char *ptr) {
   return str;
 }
 
+void rb_include_module(VALUE klass, VALUE module) {
+  rb_mod_append_features(module, klass);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -239,6 +244,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_cClass = rb_const_get(rb_cObject, rb_intern("Class"));
   /* rb_define_class */
+
+  rb_mod_append_features = get_instance_method(rb_cModule, "append_features");
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_define_global_function("load_so", load_so, 2);
