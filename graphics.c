@@ -6,9 +6,10 @@ LPD3DXEFFECT pEffect;
 
 VERTEX vtx[]=
 {
-  {      0,       0,     0,  0xff00ff00, 0.5f,0.0f  },
-  {    544,       0,     0,  0xff0000ff, 0.0f,0.0f  },
-  {      0,     416,     0,  0xffffffff, 0.5f,1.0f  },
+  {      0,       0,     0,  0xff00ff00, 0.0f,0.0f  },
+  {    544,       0,     0,  0xff0000ff, 1.0f,0.0f  },
+  {      0,     416,     0,  0xffffffff, 0.0f,1.0f  },
+  {    544,     416,     0,  0xffff0000, 1.0f,1.0f  },
 };
 
 struct hWndFinder {
@@ -75,7 +76,7 @@ static VALUE Graphics_s_update(VALUE self) {
     UINT numPass;
     pEffect->lpVtbl->Begin(pEffect, &numPass, 0 );
     pEffect->lpVtbl->BeginPass(pEffect, 0);
-    pD3DDevice->lpVtbl->DrawPrimitiveUP(pD3DDevice, D3DPT_TRIANGLESTRIP,1,vtx,sizeof(VERTEX));
+    pD3DDevice->lpVtbl->DrawPrimitiveUP(pD3DDevice, D3DPT_TRIANGLESTRIP, 2, vtx, sizeof(VERTEX));
     pEffect->lpVtbl->EndPass(pEffect);
     pEffect->lpVtbl->End(pEffect);
     pD3DDevice->lpVtbl->EndScene(pD3DDevice);
