@@ -158,4 +158,11 @@ struct METHOD {
     rb_method_entry_t me;
 };
 
-extern VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
+VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
+void rb_raise(VALUE, const char*,...);
+VALUE rb_const_get(VALUE, ID);
+ID rb_intern(const char*);
+VALUE rb_define_module_under(VALUE, const char*);
+VALUE rb_define_module(const char*);
+void rb_const_set(VALUE, ID, VALUE);
+void rb_define_singleton_method(VALUE, char *, VALUE (*)(ANYARGS), int);

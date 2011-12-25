@@ -1,14 +1,5 @@
 #include "ext_rgss.h"
-#include "d3d9.h"
-#include "d3dx9.h"
-
-#define FVF_VERTEX   (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-typedef struct
-{
-  float x, y, z;
-  D3DCOLOR diffuse;
-  float u, v;
-} VERTEX;
+#include "graphics.h"
 
 LPDIRECT3DDEVICE9 pD3DDevice;
 LPD3DXEFFECT pEffect;
@@ -70,10 +61,11 @@ static VALUE Graphics_s_init(VALUE self) {
       rb_raise(rb_eRuntimeError, "Can't load effect file");
     }
   }
+  return self;
 }
 
 static VALUE Graphics_s_update(VALUE self) {
-  D3DXMATRIX mat = {1.0/544,0,0,0, 0,-1.0/416,0,0, 1,-1,-1,-1, -1.0/2,1.0/2,1.0/2,1.0/2};
+  D3DXMATRIX mat = {{{1.0/544,0,0,0, 0,-1.0/416,0,0, 1,-1,-1,-1, -1.0/2,1.0/2,1.0/2,1.0/2}}};
 
   pD3DDevice->lpVtbl->Clear(pD3DDevice, 0, NULL, (D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0,0,0,0), 1.0f, 0);
   pD3DDevice->lpVtbl->SetFVF(pD3DDevice, FVF_VERTEX);
@@ -93,6 +85,7 @@ static VALUE Graphics_s_update(VALUE self) {
 }
 
 static VALUE Graphics_s_dummy() {
+  return Qnil;
 }
 
 void Init_ExtGraphics() {

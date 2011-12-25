@@ -1,4 +1,5 @@
 #include "ext_rgss.h"
+#include "graphics.h"
 
 VALUE (*rb_obj_method)(VALUE, VALUE);
 VALUE (*rb_f_raise)(int, VALUE*);
@@ -11,7 +12,7 @@ VALUE (*rb_str_intern)(VALUE);
 VALUE (*rb_mod_instance_method)(VALUE mod, VALUE vid);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_f_p)(int argc, VALUE *argv, VALUE self);
-struct RString buf_string = {0x2005, 0};
+struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 typedef VALUE (*cfunc)(ANYARGS);
 
@@ -99,7 +100,6 @@ VALUE rb_define_module(const char *name) {
 
 int Init_ext_rgss(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
-  VALUE mGraphics;
 
   LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
   rb_cObject = cObject;
