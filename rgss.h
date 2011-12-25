@@ -187,7 +187,7 @@ struct METHOD {
     rb_method_entry_t me;
 };
 
-VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
+extern VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
 ID rb_intern(const char*);
