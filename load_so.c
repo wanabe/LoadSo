@@ -210,6 +210,11 @@ VALUE rb_ary_push(VALUE ary, VALUE item) {
   return rb_ary_push_m(1, &item, ary);
 }
 
+void rb_global_variable(VALUE *var) {
+  VALUE global_list = rb_eval_string("$__loadso__global_list ||= []");
+  rb_ary_push(global_list, *var);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
