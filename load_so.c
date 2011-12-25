@@ -7,15 +7,17 @@ VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
 VALUE (*rb_obj_singleton_class)(VALUE);
 VALUE (*rb_mod_attr_reader)(int, VALUE*, VALUE);
 VALUE (*rb_mod_public)(int, VALUE*, VALUE);
+VALUE (*rb_mod_private)(int, VALUE*, VALUE);
 VALUE (*rb_str_intern)(VALUE);
-VALUE (*rb_mod_instance_method)(VALUE mod, VALUE vid);
+VALUE (*rb_mod_instance_method)(VALUE, VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_f_p)(int argc, VALUE *argv, VALUE self);
+VALUE (*rb_str_plus)(VALUE, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cString, rb_eRuntimeError, rb_eLoadError;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -48,19 +50,35 @@ void rb_p(VALUE obj) {
   rb_f_p(1, &obj, Qnil);
 }
 
-void rb_define_singleton_method(VALUE obj, char *name, VALUE (*func)(ANYARGS), int argc) {
-  VALUE klass, vmethod;
+void rb_define_method(VALUE klass, const char *name, VALUE (*func)(ANYARGS), int argc) {
+  VALUE vmethod;
   struct METHOD *method;
 
-  klass = rb_obj_singleton_class(obj);
   set_buf_string(name);
   rb_mod_attr_reader(1, &value_buf_string, klass);
-  rb_mod_public(1, &value_buf_string, klass);
-  vmethod = rb_obj_method(obj, value_buf_string);
+  vmethod = rb_mod_instance_method(klass, value_buf_string);
   method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
   method->me.def->type = VM_METHOD_TYPE_CFUNC;
   method->me.def->body.cfunc.func = func;
   method->me.def->body.cfunc.argc = argc;
+  rb_mod_public(1, &value_buf_string, klass);
+}
+
+void rb_define_private_method(VALUE klass, const char *name, VALUE (*func)(ANYARGS), int argc) {
+  rb_define_method(klass, name, func, argc);
+  rb_mod_private(1, &value_buf_string, klass);
+}
+void rb_define_singleton_method(VALUE obj, const char *name, VALUE (*func)(ANYARGS), int argc) {
+  rb_define_method(rb_obj_singleton_class(obj), name, func, argc);
+}
+
+void rb_define_module_function(VALUE module, const char *name, VALUE (*func)(ANYARGS), int argc) {
+  rb_define_private_method(module, name, func, argc);
+  rb_define_singleton_method(module, name, func, argc);
+}
+
+void rb_define_global_function(const char *name, VALUE (*func)(ANYARGS), int argc) {
+  rb_define_module_function(rb_mKernel, name, func, argc);
 }
 
 ID rb_intern(const char *name) {
@@ -70,7 +88,8 @@ ID rb_intern(const char *name) {
 
 VALUE rb_const_get(VALUE klass, ID id) {
   VALUE sym = ID2SYM(id);
-  return rb_mod_const_get(1, &sym, klass);
+  VALUE ret = rb_mod_const_get(1, &sym, klass);
+  return ret;
 }
 
 void rb_const_set(VALUE klass, ID id, VALUE val) {
@@ -94,6 +113,28 @@ VALUE rb_define_module_under(VALUE outer, const char *name) {
 
 VALUE rb_define_module(const char *name) {
   return rb_define_module_under(rb_cObject, name);
+}
+
+VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
+  void (*init_func)();
+  HMODULE hSo;
+
+  hSo = LoadLibrary(RSTRING_PTR(file));
+  if(!hSo) {
+    VALUE msg;
+    set_buf_string("Can't load: ");
+    msg = rb_str_plus(value_buf_string, file);
+    rb_raise(rb_eLoadError, RSTRING_PTR(msg));
+  }
+  init_func = (void(*)())GetProcAddress(hSo, RSTRING_PTR(init_name));
+  if(!init_func) {
+    VALUE msg;
+    set_buf_string("Can't Init: ");
+    msg = rb_str_plus(value_buf_string, file);
+    rb_raise(rb_eLoadError, RSTRING_PTR(msg));
+  }
+  init_func();
+  return Qnil;
 }
 
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
@@ -123,16 +164,29 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_mod_attr_reader = get_method(rb_cObject, "attr_reader");
   rb_mod_public = get_method(rb_cObject, "public");
+  /* rb_define_method */
+
+  rb_mod_private = get_method(rb_cObject, "private");
+  /* rb_define_private_method */
+
   rb_obj_singleton_class = get_global_func("singleton_class");
   /* rb_define_singleton_method */
 
+  rb_mKernel = rb_const_get(rb_cObject, rb_intern("Kernel"));
+  /* rb_define_global_function */
+
   rb_f_raise = get_global_func("raise");
-  rb_eRuntimeError = rb_const_get(rb_cObject, rb_intern("RuntimeError"));
   /* rb_raise */
+
+  rb_eRuntimeError = rb_const_get(rb_cObject, rb_intern("RuntimeError"));
+  rb_eLoadError = rb_const_get(rb_cObject, rb_intern("LoadError"));
 
   rb_class_new_instance = get_method(rb_cObject, "new");
   rb_cModule = rb_const_get(rb_cObject, rb_intern("Module"));
   /* rb_define_module */
+
+  rb_str_plus = get_instance_method(rb_cString, "+");
+  rb_define_global_function("load_so", load_so, 2);
 
   return 1;
 }

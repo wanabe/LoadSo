@@ -34,6 +34,29 @@ enum ruby_special_consts {
 #define ID2SYM(x) (((VALUE)(x)<<RUBY_SPECIAL_SHIFT)|SYMBOL_FLAG)
 #define SYM2ID(x) RSHIFT((unsigned long)(x),RUBY_SPECIAL_SHIFT)
 
+#define FL_USHIFT    12
+
+#define FL_USER0     (((VALUE)1)<<(FL_USHIFT+0))
+#define FL_USER1     (((VALUE)1)<<(FL_USHIFT+1))
+#define FL_USER2     (((VALUE)1)<<(FL_USHIFT+2))
+#define FL_USER3     (((VALUE)1)<<(FL_USHIFT+3))
+#define FL_USER4     (((VALUE)1)<<(FL_USHIFT+4))
+#define FL_USER5     (((VALUE)1)<<(FL_USHIFT+5))
+#define FL_USER6     (((VALUE)1)<<(FL_USHIFT+6))
+#define FL_USER7     (((VALUE)1)<<(FL_USHIFT+7))
+#define FL_USER8     (((VALUE)1)<<(FL_USHIFT+8))
+#define FL_USER9     (((VALUE)1)<<(FL_USHIFT+9))
+#define FL_USER10    (((VALUE)1)<<(FL_USHIFT+10))
+#define FL_USER11    (((VALUE)1)<<(FL_USHIFT+11))
+#define FL_USER12    (((VALUE)1)<<(FL_USHIFT+12))
+#define FL_USER13    (((VALUE)1)<<(FL_USHIFT+13))
+#define FL_USER14    (((VALUE)1)<<(FL_USHIFT+14))
+#define FL_USER15    (((VALUE)1)<<(FL_USHIFT+15))
+#define FL_USER16    (((VALUE)1)<<(FL_USHIFT+16))
+#define FL_USER17    (((VALUE)1)<<(FL_USHIFT+17))
+#define FL_USER18    (((VALUE)1)<<(FL_USHIFT+18))
+#define FL_USER19    (((VALUE)1)<<(FL_USHIFT+19))
+
 struct RBasic {
     VALUE flags;
     VALUE klass;
@@ -54,6 +77,11 @@ struct RString {
 	char ary[RSTRING_EMBED_LEN_MAX + 1];
     } as;
 };
+#define RSTRING_NOEMBED FL_USER1
+#define RSTRING_PTR(str) \
+    (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
+     RSTRING(str)->as.ary : \
+     RSTRING(str)->as.heap.ptr)
 
 struct RData {
     struct RBasic basic;
@@ -92,6 +120,7 @@ struct RTypedData {
 
 #define R_CAST(st)      (struct st*)
 #define RBASIC(obj)     (R_CAST(RBasic)(obj))
+#define RSTRING(obj)    (R_CAST(RString)(obj))
 #define RDATA(obj)      (R_CAST(RData)(obj))
 #define RTYPEDDATA(obj) (R_CAST(RTypedData)(obj))
 
@@ -165,4 +194,4 @@ ID rb_intern(const char*);
 VALUE rb_define_module_under(VALUE, const char*);
 VALUE rb_define_module(const char*);
 void rb_const_set(VALUE, ID, VALUE);
-void rb_define_singleton_method(VALUE, char *, VALUE (*)(ANYARGS), int);
+void rb_define_singleton_method(VALUE, const char*, VALUE (*)(ANYARGS), int);
