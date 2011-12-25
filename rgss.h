@@ -120,6 +120,13 @@ enum ruby_value_type {
 #define T_NODE   RUBY_T_NODE
 #define T_ZOMBIE RUBY_T_ZOMBIE
 #define T_MASK   RUBY_T_MASK
+#define BUILTIN_TYPE(x) (int)(((struct RBasic*)(x))->flags & T_MASK)
+
+#define RTEST(v) (((VALUE)(v) & ~Qnil) != 0)
+#define NIL_P(v) ((VALUE)(v) == Qnil)
+#define FIXNUM_P(f) (((SIGNED_VALUE)(f))&FIXNUM_FLAG)
+#define IMMEDIATE_P(x) ((VALUE)(x) & IMMEDIATE_MASK)
+#define SYMBOL_P(x) (((VALUE)(x)&~(~(VALUE)0<<RUBY_SPECIAL_SHIFT))==SYMBOL_FLAG)
 
 struct RBasic {
     VALUE flags;

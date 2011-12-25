@@ -19,6 +19,9 @@ VALUE (*rb_f_eval)(int, VALUE*, VALUE);
 VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
 VALUE (*rb_mod_append_features)(VALUE, VALUE);
 VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
+VALUE (*rb_proc_s_new)(int, VALUE*, VALUE);
+VALUE (*proc_call)(int, VALUE*, VALUE);
+VALUE (*rb_f_block_given_p)();
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc;
@@ -232,9 +235,22 @@ void rb_global_variable(VALUE *var) {
   rb_ary_push(global_list, *var);
 }
 
+VALUE rb_yield(VALUE val) {
+  VALUE proc = rb_proc_s_new(0, NULL, rb_cProc);
+  return proc_call(1, &val, proc);
+}
+
 int WINAPI rb_w32_Sleep(unsigned long msec) {
   Sleep(msec);
   return msec;
+}
+
+VALUE rb_block_proc() {
+  return rb_proc_s_new(0, NULL, rb_cProc);
+}
+
+int rb_block_given_p() {
+  return RTEST(rb_f_block_given_p());
 }
 
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
@@ -301,6 +317,10 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_ary_push_m = get_instance_method(rb_cArray, "push");
 
   rb_cProc = rb_const_get(rb_cObject, rb_intern("Proc"));
+  rb_proc_s_new = get_method(rb_cProc, "new");
+  proc_call = get_instance_method(rb_cProc, "call");
+
+  rb_f_block_given_p = get_global_func("block_given?");
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_define_global_function("load_so", load_so, 2);
