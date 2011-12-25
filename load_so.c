@@ -121,6 +121,11 @@ void rb_const_set(VALUE klass, ID id, VALUE val) {
   rb_mod_const_set(klass, sym, val);
 }
 
+void rb_define_const(VALUE klass, const char *name, VALUE val) {
+  set_buf_string(name);
+  rb_mod_const_set(klass, value_buf_string, val);
+}
+
 void rb_raise(VALUE exc, const char *msg,...) {
   VALUE v[2] = {exc, value_buf_string};
 
