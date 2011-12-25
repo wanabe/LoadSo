@@ -12,6 +12,7 @@
 
 typedef unsigned long VALUE;
 typedef unsigned long ID;
+#define SIGNED_VALUE long
 
 enum ruby_special_consts {
     RUBY_Qfalse = 0,
@@ -36,8 +37,9 @@ enum ruby_special_consts {
 #define SYM2ID(x) RSHIFT((unsigned long)(x),RUBY_SPECIAL_SHIFT)
 #define ID_ALLOCATOR 1
 
-#define FL_USHIFT    12
+#define INT2FIX(i) ((VALUE)(((SIGNED_VALUE)(i))<<1 | FIXNUM_FLAG))
 
+#define FL_USHIFT    12
 #define FL_USER0     (((VALUE)1)<<(FL_USHIFT+0))
 #define FL_USER1     (((VALUE)1)<<(FL_USHIFT+1))
 #define FL_USER2     (((VALUE)1)<<(FL_USHIFT+2))
@@ -153,6 +155,27 @@ struct RString {
      RSTRING(str)->as.ary : \
      RSTRING(str)->as.heap.ptr)
 
+#define RARRAY_EMBED_LEN_MAX 3
+struct RArray {
+    struct RBasic basic;
+    union {
+	struct {
+	    long len;
+	    union {
+		long capa;
+		VALUE shared;
+	    } aux;
+	    VALUE *ptr;
+	} heap;
+	VALUE ary[RARRAY_EMBED_LEN_MAX];
+    } as;
+};
+#define RARRAY_EMBED_FLAG FL_USER1
+#define RARRAY_PTR(a) \
+    ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
+     RARRAY(a)->as.ary : \
+     RARRAY(a)->as.heap.ptr)
+
 struct RData {
     struct RBasic basic;
     void (*dmark)(void*);
@@ -188,12 +211,23 @@ struct RTypedData {
 } while(0) /* TODO: type check */
 typedef void (*RUBY_DATA_FUNC)(void*);
 
-#define R_CAST(st)      (struct st*)
-#define RBASIC(obj)     (R_CAST(RBasic)(obj))
-#define RCLASS(obj)     (R_CAST(RClass)(obj))
-#define RSTRING(obj)    (R_CAST(RString)(obj))
-#define RDATA(obj)      (R_CAST(RData)(obj))
-#define RTYPEDDATA(obj) (R_CAST(RTypedData)(obj))
+#define R_CAST(st)   (struct st*)
+#define RBASIC(obj)  (R_CAST(RBasic)(obj))
+#define ROBJECT(obj) (R_CAST(RObject)(obj))
+#define RCLASS(obj)  (R_CAST(RClass)(obj))
+#define RMODULE(obj) RCLASS(obj)
+#define RFLOAT(obj)  (R_CAST(RFloat)(obj))
+#define RSTRING(obj) (R_CAST(RString)(obj))
+#define RREGEXP(obj) (R_CAST(RRegexp)(obj))
+#define RARRAY(obj)  (R_CAST(RArray)(obj))
+#define RHASH(obj)   (R_CAST(RHash)(obj))
+#define RDATA(obj)   (R_CAST(RData)(obj))
+#define RTYPEDDATA(obj)   (R_CAST(RTypedData)(obj))
+#define RSTRUCT(obj) (R_CAST(RStruct)(obj))
+#define RBIGNUM(obj) (R_CAST(RBignum)(obj))
+#define RFILE(obj)   (R_CAST(RFile)(obj))
+#define RRATIONAL(obj) (R_CAST(RRational)(obj))
+#define RCOMPLEX(obj) (R_CAST(RComplex)(obj))
 
 typedef enum {
     NOEX_PUBLIC    = 0x00,

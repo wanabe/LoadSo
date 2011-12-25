@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include "load_so.h"
 #include "st.h"
 
@@ -164,6 +165,22 @@ VALUE rb_data_object_alloc(VALUE klass, void *datap, RUBY_DATA_FUNC dmark, RUBY_
   return (VALUE)data;
 }
 
+VALUE rb_ary_new3(long n, ...) {
+  va_list ar;
+  VALUE ary = INT2FIX(n);
+  long i;
+
+  ary = rb_class_new_instance(1, &ary, rb_cArray);
+
+  va_start(ar, n);
+  for (i=0; i<n; i++) {
+    RARRAY_PTR(ary)[i] = va_arg(ar, VALUE);
+  }
+  va_end(ar);
+
+  return ary;
+}
+
 static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
   void (*init_func)();
   HMODULE hSo;
@@ -203,7 +220,7 @@ void rb_include_module(VALUE klass, VALUE module) {
 }
 
 void rb_set_end_proc(void (*func)(VALUE), VALUE data) {
-  fprintf(stderr, "TODO: rb_set_end_proc is unable yet");
+  fprintf(stderr, "TODO: rb_set_end_proc is unable yet\n");
 }
 
 VALUE rb_ary_push(VALUE ary, VALUE item) {
