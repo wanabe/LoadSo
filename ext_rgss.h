@@ -4,3 +4,5 @@
 #ifndef DLL_NAME
 #define DLL_NAME "ext_rgss.dll"
 #endif
+
+extern VALUE mExtRgss;
