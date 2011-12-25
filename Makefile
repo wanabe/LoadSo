@@ -5,7 +5,7 @@ A=libloadso.a
 LDFLAGS=$(LIBDIRS) -shared -Wl,--out-implib,$(A)
 DLL=msvcrt-ruby191.dll
 CFLAGS=-Wall -DDLL_NAME="\"$(DLL)\""
-OBJS=load_so.o
+OBJS=load_so.o st.o
 LIBS=
 
 all: $(DLL) $(A)

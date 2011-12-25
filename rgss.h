@@ -8,6 +8,7 @@
 #define ANYARGS
 #endif
 #define RSHIFT(x,y) ((x)>>(int)(y))
+#define ALLOC(type) ((type*)malloc(sizeof(type)))
 
 typedef unsigned long VALUE;
 typedef unsigned long ID;
@@ -33,6 +34,7 @@ enum ruby_special_consts {
 
 #define ID2SYM(x) (((VALUE)(x)<<RUBY_SPECIAL_SHIFT)|SYMBOL_FLAG)
 #define SYM2ID(x) RSHIFT((unsigned long)(x),RUBY_SPECIAL_SHIFT)
+#define ID_ALLOCATOR 1
 
 #define FL_USHIFT    12
 
@@ -61,6 +63,14 @@ struct RBasic {
     VALUE flags;
     VALUE klass;
 };
+
+struct RClass {
+    struct RBasic basic;
+    /*rb_classext_t*/void *ptr;
+    struct st_table *m_tbl;
+    struct st_table *iv_index_tbl;
+};
+#define RCLASS_M_TBL(c) (RCLASS(c)->m_tbl)
 
 #define RSTRING_EMBED_LEN_MAX ((int)((sizeof(VALUE)*3)/sizeof(char)-1))
 struct RString {
@@ -120,6 +130,7 @@ struct RTypedData {
 
 #define R_CAST(st)      (struct st*)
 #define RBASIC(obj)     (R_CAST(RBasic)(obj))
+#define RCLASS(obj)     (R_CAST(RClass)(obj))
 #define RSTRING(obj)    (R_CAST(RString)(obj))
 #define RDATA(obj)      (R_CAST(RData)(obj))
 #define RTYPEDDATA(obj) (R_CAST(RTypedData)(obj))

@@ -1,4 +1,5 @@
 #include "load_so.h"
+#include "st.h"
 
 VALUE (*rb_obj_method)(VALUE, VALUE);
 VALUE (*rb_f_raise)(int, VALUE*);
@@ -20,7 +21,7 @@ VALUE dummy_proc;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cString, rb_eRuntimeError, rb_eLoadError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cString, rb_eRuntimeError, rb_eLoadError;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -51,6 +52,26 @@ static cfunc get_instance_method(VALUE mod, char *name) {
 
 void rb_p(VALUE obj) {
   rb_f_p(1, &obj, Qnil);
+}
+
+void rb_define_alloc_func(VALUE klass, VALUE (*func)(VALUE)) {
+  rb_method_definition_t *def = ALLOC(rb_method_definition_t);
+  st_table *mtbl = RCLASS_M_TBL(klass);
+  rb_method_entry_t *me = ALLOC(rb_method_entry_t);
+  me->flag = NOEX_PRIVATE;
+  me->mark = 0;
+  me->called_id = ID_ALLOCATOR;
+  me->klass = klass;
+  me->def = def;
+  def->type = VM_METHOD_TYPE_CFUNC;
+  def->original_id = ID_ALLOCATOR;
+  def->alias_count = 0;
+  def->body.cfunc.func = func;
+  def->body.cfunc.argc = 0;
+  st_insert(mtbl, ID_ALLOCATOR, (st_data_t) me);
+
+  set_buf_string("object_id");
+  rb_mod_public(1, &value_buf_string, klass);
 }
 
 void rb_define_method(VALUE klass, const char *name, VALUE (*func)(ANYARGS), int argc) {
@@ -106,6 +127,12 @@ void rb_raise(VALUE exc, const char *msg,...) {
   /* TODO: va_args */
   set_buf_string(msg);
   rb_f_raise(2, v);
+}
+
+VALUE rb_define_class_under(VALUE outer, const char *name) {
+  VALUE mod = rb_class_new_instance(0, NULL, rb_cClass);
+  rb_const_set(outer, rb_intern(name), mod);
+  return mod;
 }
 
 VALUE rb_define_module_under(VALUE outer, const char *name) {
@@ -196,6 +223,9 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_class_new_instance = get_method(rb_cObject, "new");
   rb_cModule = rb_const_get(rb_cObject, rb_intern("Module"));
   /* rb_define_module */
+
+  rb_cClass = rb_const_get(rb_cObject, rb_intern("Class"));
+  /* rb_define_class */
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_define_global_function("load_so", load_so, 2);
