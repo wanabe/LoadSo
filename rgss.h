@@ -190,6 +190,13 @@ struct RArray {
      RARRAY(a)->as.ary : \
      RARRAY(a)->as.heap.ptr)
 
+struct RFloat {
+    struct RBasic basic;
+    double float_value;
+};
+#define RFLOAT_VALUE(v) (RFLOAT(v)->float_value)
+#define DBL2NUM(dbl)  rb_float_new(dbl)
+
 struct RData {
     struct RBasic basic;
     void (*dmark)(void*);

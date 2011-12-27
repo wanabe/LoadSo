@@ -30,7 +30,7 @@ VALUE dummy_proc;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -446,6 +446,14 @@ VALUE rb_newobj() {
   return rb_class_new_instance(0, NULL, rb_cObject);
 }
 
+VALUE rb_float_new(double d) {
+  NEWOBJ(flt, struct RFloat);
+  OBJSETUP(flt, rb_cFloat, T_FLOAT);
+
+  flt->float_value = d;
+  return (VALUE)flt;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -512,6 +520,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_cProc = rb_const_get(rb_cObject, rb_intern("Proc"));
   rb_proc_s_new = get_method(rb_cProc, "new");
   proc_call = get_instance_method(rb_cProc, "call");
+
+  rb_cFloat = rb_const_get(rb_cObject, rb_intern("Float"));
 
   rb_f_block_given_p = get_global_func("block_given?");
 
