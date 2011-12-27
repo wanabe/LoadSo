@@ -3,25 +3,25 @@
 #include "load_so.h"
 #include "st.h"
 
-VALUE (*rb_obj_method)(VALUE, VALUE);
 VALUE (*rb_f_raise)(int, VALUE*);
-VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
-VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
-VALUE (*rb_obj_singleton_class)(VALUE);
-VALUE (*rb_mod_public)(int, VALUE*, VALUE);
-VALUE (*rb_mod_private)(int, VALUE*, VALUE);
-VALUE (*rb_str_intern)(VALUE);
-VALUE (*rb_mod_instance_method)(VALUE, VALUE);
-VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_f_p)(int, VALUE*, VALUE);
-VALUE (*rb_str_plus)(VALUE, VALUE);
 VALUE (*rb_f_eval)(int, VALUE*, VALUE);
-VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
-VALUE (*rb_mod_append_features)(VALUE, VALUE);
-VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 VALUE (*rb_proc_s_new)(int, VALUE*, VALUE);
 VALUE (*proc_call)(int, VALUE*, VALUE);
 VALUE (*rb_f_block_given_p)();
+VALUE (*rb_obj_method)(VALUE, VALUE);
+VALUE (*rb_obj_singleton_class)(VALUE);
+VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
+VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
+VALUE (*rb_mod_public)(int, VALUE*, VALUE);
+VALUE (*rb_mod_private)(int, VALUE*, VALUE);
+VALUE (*rb_mod_instance_method)(VALUE, VALUE);
+VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
+VALUE (*rb_mod_append_features)(VALUE, VALUE);
+VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
+VALUE (*rb_str_intern)(VALUE);
+VALUE (*rb_str_plus)(VALUE, VALUE);
+VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc;
