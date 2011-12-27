@@ -442,6 +442,10 @@ VALUE rb_ary_join(VALUE ary, VALUE sep) {
   return rb_ary_join_m(1, &sep, ary);
 }
 
+VALUE rb_newobj() {
+  return rb_class_new_instance(0, NULL, rb_cObject);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 

@@ -257,6 +257,13 @@ static inline int rb_type(VALUE obj) {
 }
 #define TYPE(x) rb_type((VALUE)(x))
 
+VALUE rb_newobj(void);
+#define NEWOBJ(obj,type) type *(obj) = (type*)rb_newobj()
+#define OBJSETUP(obj,c,t) do {\
+    RBASIC(obj)->flags = (t);\
+    RBASIC(obj)->klass = (c);\
+} while (0)
+
 typedef enum {
     NOEX_PUBLIC    = 0x00,
     NOEX_NOSUPER   = 0x01,
