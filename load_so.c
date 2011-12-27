@@ -22,6 +22,7 @@ VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_str_intern)(VALUE);
 VALUE (*rb_str_plus)(VALUE, VALUE);
 VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
+VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc;
@@ -424,6 +425,13 @@ rb_scan_args(int argc, const VALUE *argv, const char *fmt, ...)
   return 0;
 }
 
+VALUE rb_ary_join(VALUE ary, VALUE sep) {
+  printf("1\n");
+  rb_ary_join_m(1, &sep, ary);
+  printf("2\n");
+  return rb_ary_join_m(1, &sep, ary);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -492,6 +500,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   proc_call = get_instance_method(rb_cProc, "call");
 
   rb_f_block_given_p = get_global_func("block_given?");
+
+  rb_ary_join_m = get_instance_method(rb_cArray, "join");
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_define_global_function("load_so", load_so, 2);
