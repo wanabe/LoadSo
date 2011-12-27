@@ -21,6 +21,7 @@ VALUE (*rb_mod_append_features)(VALUE, VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_str_intern)(VALUE);
 VALUE (*rb_str_plus)(VALUE, VALUE);
+VALUE (*rb_str_concat)(VALUE, VALUE);
 VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
@@ -185,6 +186,17 @@ VALUE rb_ary_new3(long n, ...) {
   return ary;
 }
 
+VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
+  buf_string.as.heap.ptr = (char*)str;
+  buf_string.as.heap.len = len;
+  str = rb_str_concat(str, value_buf_string);
+  return str;
+}
+
+VALUE rb_str_new(const char *ptr, long len) {
+  return rb_str_cat(rb_class_new_instance(0, NULL, rb_cString), ptr, len);
+}
+
 static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
   void (*init_func)();
   HMODULE hSo;
@@ -213,9 +225,9 @@ VALUE rb_eval_string(const char *str) {
 }
 
 VALUE rb_str_new_cstr(const char *ptr) {
-  VALUE str = rb_class_new_instance(0, NULL, rb_cModule);
+  VALUE str = rb_class_new_instance(0, NULL, rb_cString);
   set_buf_string(ptr);
-  str = rb_str_plus(str, value_buf_string);
+  str = rb_str_concat(str, value_buf_string);
   return str;
 }
 
@@ -504,6 +516,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_ary_join_m = get_instance_method(rb_cArray, "join");
 
   rb_str_plus = get_instance_method(rb_cString, "+");
+  rb_str_concat = get_instance_method(rb_cString, "concat");
+
   rb_define_global_function("load_so", load_so, 2);
 
   return 1;
