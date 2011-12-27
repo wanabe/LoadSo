@@ -236,7 +236,7 @@ void rb_include_module(VALUE klass, VALUE module) {
 }
 
 void rb_set_end_proc(void (*func)(VALUE), VALUE data) {
-  fprintf(stderr, "TODO: rb_set_end_proc is unable yet\n");
+  fprintf(stderr, "TODO: LoadSo can't set rb_set_end_proc\n");
 }
 
 VALUE rb_ary_push(VALUE ary, VALUE item) {
