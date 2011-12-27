@@ -438,9 +438,7 @@ rb_scan_args(int argc, const VALUE *argv, const char *fmt, ...)
 }
 
 VALUE rb_ary_join(VALUE ary, VALUE sep) {
-  printf("1\n");
   rb_ary_join_m(1, &sep, ary);
-  printf("2\n");
   return rb_ary_join_m(1, &sep, ary);
 }
 
