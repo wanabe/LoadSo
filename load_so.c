@@ -31,7 +31,7 @@ VALUE dummy_proc;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -464,6 +464,10 @@ double rb_num2dbl(VALUE num) {
   return RFLOAT_VALUE(rb_f_float(Qnil, num));
 }
 
+VALUE rb_hash_new() {
+  return rb_class_new_instance(0, NULL, rb_cHash);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -540,6 +544,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_str_concat = get_instance_method(rb_cString, "concat");
+
+  rb_cHash = rb_const_get(rb_cObject, rb_intern("Hash"));
 
   rb_define_global_function("load_so", load_so, 2);
 
