@@ -27,7 +27,7 @@ VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
-VALUE dummy_proc;
+VALUE dummy_proc, init_hash;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
@@ -468,6 +468,13 @@ VALUE rb_hash_new() {
   return rb_class_new_instance(0, NULL, rb_cHash);
 }
 
+struct st_table *rb_hash_tbl(VALUE hash) {
+  if (!RHASH(hash)->ntbl) {
+    RHASH(hash)->ntbl = st_init_table(RHASH(init_hash)->ntbl->type);
+  }
+  return RHASH(hash)->ntbl;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -546,6 +553,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_str_concat = get_instance_method(rb_cString, "concat");
 
   rb_cHash = rb_const_get(rb_cObject, rb_intern("Hash"));
+  init_hash = rb_eval_string("$__loadso__init_hash = Hash.new");
 
   rb_define_global_function("load_so", load_so, 2);
 

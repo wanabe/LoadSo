@@ -197,6 +197,13 @@ struct RFloat {
 #define RFLOAT_VALUE(v) (RFLOAT(v)->float_value)
 #define DBL2NUM(dbl)  rb_float_new(dbl)
 
+struct RHash {
+    struct RBasic basic;
+    struct st_table *ntbl;      /* possibly 0 */
+    int iter_lev;
+    VALUE ifnone;
+};
+
 struct RData {
     struct RBasic basic;
     void (*dmark)(void*);
