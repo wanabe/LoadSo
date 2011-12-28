@@ -66,7 +66,10 @@ void rb_p(VALUE obj) {
 
 void rb_define_alloc_func(VALUE klass, VALUE (*func)(VALUE)) {
   rb_method_definition_t *def = ALLOC(rb_method_definition_t);
-  st_table *mtbl = RCLASS_M_TBL(klass);
+  st_table *mtbl;
+
+  klass = rb_obj_singleton_class(klass);
+  mtbl = RCLASS_M_TBL(klass);
   rb_method_entry_t *me = ALLOC(rb_method_entry_t);
   me->flag = NOEX_PRIVATE;
   me->mark = 0;
