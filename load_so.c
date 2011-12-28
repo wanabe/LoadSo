@@ -19,6 +19,7 @@ VALUE (*rb_mod_instance_method)(VALUE, VALUE);
 VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
 VALUE (*rb_mod_append_features)(VALUE, VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
+VALUE (*rb_f_float)(VALUE, VALUE);
 VALUE (*rb_str_intern)(VALUE);
 VALUE (*rb_str_plus)(VALUE, VALUE);
 VALUE (*rb_str_concat)(VALUE, VALUE);
@@ -454,6 +455,15 @@ VALUE rb_float_new(double d) {
   return (VALUE)flt;
 }
 
+VALUE rb_Float(VALUE val) {
+  return rb_f_float(Qnil, val);
+}
+
+double rb_num2dbl(VALUE num) {
+  /* TODO: String shouldn't be OK */
+  return RFLOAT_VALUE(rb_f_float(Qnil, num));
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -522,6 +532,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   proc_call = get_instance_method(rb_cProc, "call");
 
   rb_cFloat = rb_const_get(rb_cObject, rb_intern("Float"));
+  rb_f_float = get_global_func("Float");
 
   rb_f_block_given_p = get_global_func("block_given?");
 
