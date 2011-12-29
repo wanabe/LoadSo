@@ -271,6 +271,22 @@ static inline int rb_type(VALUE obj) {
 }
 #define TYPE(x) rb_type((VALUE)(x))
 
+extern VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
+extern VALUE rb_cFixnum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
+static inline VALUE rb_class_of(VALUE obj) {
+  if (IMMEDIATE_P(obj)) {
+    if (FIXNUM_P(obj)) return rb_cFixnum;
+    if (obj == Qtrue)  return rb_cTrueClass;
+    if (SYMBOL_P(obj)) return rb_cSymbol;
+  }
+  else if (!RTEST(obj)) {
+    if (obj == Qnil)   return rb_cNilClass;
+    if (obj == Qfalse) return rb_cFalseClass;
+  }
+  return RBASIC(obj)->klass;
+}
+#define CLASS_OF(v) rb_class_of((VALUE)(v))
+
 VALUE rb_newobj(void);
 #define NEWOBJ(obj,type) type *(obj) = (type*)rb_newobj()
 #define OBJSETUP(obj,c,t) do {\
@@ -343,7 +359,6 @@ struct METHOD {
 
 #define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
 
-extern VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
 ID rb_intern(const char*);

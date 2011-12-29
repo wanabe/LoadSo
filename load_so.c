@@ -18,6 +18,7 @@ VALUE (*rb_mod_private)(int, VALUE*, VALUE);
 VALUE (*rb_mod_instance_method)(VALUE, VALUE);
 VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
 VALUE (*rb_mod_append_features)(VALUE, VALUE);
+VALUE (*rb_mod_name)(VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_f_float)(VALUE, VALUE);
 VALUE (*rb_str_intern)(VALUE);
@@ -32,6 +33,7 @@ VALUE dummy_proc, init_hash;
 typedef VALUE (*cfunc)(ANYARGS);
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
+VALUE rb_cFixnum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -478,6 +480,13 @@ struct st_table *rb_hash_tbl(VALUE hash) {
   return RHASH(hash)->ntbl;
 }
 
+const char *rb_obj_classname(VALUE obj) {
+  /* TODO: rb_obj_classname is not equal rb_mod_name exactly. */
+  VALUE name = rb_mod_name(CLASS_OF(obj));
+  /* TODO: Is GC safe? */
+  return RSTRING_PTR(name);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -500,6 +509,12 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   buf_string.basic.klass = rb_cString;
   rb_str_intern = get_instance_method(rb_cString, "intern");
   /* rb_intern, rb_const_get */
+
+  rb_cFixnum = rb_const_get(rb_cObject, rb_intern("Fixnum"));
+  rb_cTrueClass = rb_const_get(rb_cObject, rb_intern("TrueClass"));
+  rb_cSymbol = rb_const_get(rb_cObject, rb_intern("Symbol"));
+  rb_cNilClass = rb_const_get(rb_cObject, rb_intern("NilClass"));
+  rb_cFalseClass = rb_const_get(rb_cObject, rb_intern("FalseClass"));
 
   rb_mod_const_set = get_method(rb_cObject, "const_set");
   /* rb_const_set */
@@ -532,6 +547,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_class_new_instance = get_method(rb_cObject, "new");
   rb_cModule = rb_const_get(rb_cObject, rb_intern("Module"));
   /* rb_define_module */
+
+  rb_mod_name = get_instance_method(rb_cModule, "name");
 
   rb_cClass = rb_const_get(rb_cObject, rb_intern("Class"));
   /* rb_define_class */
