@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#define va_init_list(a,b) va_start((a),(b))
 #include "load_so.h"
 #include "st.h"
 
@@ -26,6 +27,7 @@ VALUE (*rb_str_plus)(VALUE, VALUE);
 VALUE (*rb_str_concat)(VALUE, VALUE);
 VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
+VALUE (*rb_f_public_send)(int argc, VALUE *argv, VALUE recv);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
@@ -487,6 +489,22 @@ const char *rb_obj_classname(VALUE obj) {
   return RSTRING_PTR(name);
 }
 
+VALUE rb_funcall(VALUE recv, ID mid, int n, ...) {
+  va_list ar;
+  int i;
+  VALUE ary = INT2FIX(n + 1), *ptr;
+
+  ary = rb_class_new_instance(1, &ary, rb_cArray);
+  ptr = RARRAY_PTR(ary);
+  ptr[0] = ID2SYM(mid);
+  va_init_list(ar, n);
+  for (i = 1; i <= n; i++) {
+    ptr[i] = va_arg(ar, VALUE);
+  }
+  va_end(ar);
+  return rb_f_public_send(n + 1, ptr, recv);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -574,6 +592,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_cHash = rb_const_get(rb_cObject, rb_intern("Hash"));
   init_hash = rb_eval_string("$__loadso__init_hash = Hash.new");
+
+  rb_f_public_send = get_instance_method(rb_cObject, "public_send");
 
   rb_define_global_function("load_so", load_so, 2);
 
