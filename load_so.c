@@ -256,11 +256,6 @@ VALUE rb_ary_push(VALUE ary, VALUE item) {
   return rb_ary_push_m(1, &item, ary);
 }
 
-void rb_global_variable(VALUE *var) {
-  VALUE global_list = rb_eval_string("$__loadso__global_list ||= []");
-  rb_ary_push(global_list, *var);
-}
-
 void rb_check_type(VALUE x, int t) {
   int xt;
 
@@ -535,6 +530,19 @@ void rb_gc_mark(VALUE ptr) {
   default:
     rb_raise(rb_eNotImpError, "mark %s is not implemented yet", BUILTIN_TYPE(obj));
   }
+}
+
+static void gv_mark(void *ptr) {
+  rb_gc_mark(*(VALUE*)ptr);
+}
+
+static void gv_free(void *ptr) {
+}
+
+void rb_global_variable(VALUE *var) {
+  VALUE wrap, global_list = rb_eval_string("$__loadso__global_list ||= []");
+  wrap = rb_data_object_alloc(0, var, gv_mark, gv_free);
+  rb_ary_push(global_list, wrap);
 }
 
 VALUE rb_int2big(SIGNED_VALUE n) {
