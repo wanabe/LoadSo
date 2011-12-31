@@ -172,6 +172,10 @@ VALUE rb_define_class_under(VALUE outer, const char *name, VALUE super) {
   return mod;
 }
 
+VALUE rb_define_class(const char *name, VALUE super) {
+  return rb_define_class_under(rb_cObject, name, super);
+}
+
 VALUE rb_define_module_under(VALUE outer, const char *name) {
   VALUE mod = rb_class_new_instance(0, NULL, rb_cModule);
   rb_const_set(outer, rb_intern(name), mod);
