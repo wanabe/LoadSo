@@ -151,8 +151,8 @@ void rb_raise(VALUE exc, const char *msg,...) {
   rb_f_raise(2, v);
 }
 
-VALUE rb_define_class_under(VALUE outer, const char *name) {
-  VALUE mod = rb_class_new_instance(0, NULL, rb_cClass);
+VALUE rb_define_class_under(VALUE outer, const char *name, VALUE super) {
+  VALUE mod = rb_class_new_instance(1, &super, rb_cClass);
   rb_const_set(outer, rb_intern(name), mod);
   return mod;
 }
