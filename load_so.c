@@ -545,6 +545,11 @@ void rb_global_variable(VALUE *var) {
   rb_ary_push(global_list, wrap);
 }
 
+void rb_gc_register_mark_object(VALUE obj) {
+  VALUE global_list = rb_eval_string("$__loadso__global_list ||= []");
+  rb_ary_push(global_list, obj);
+}
+
 VALUE rb_int2big(SIGNED_VALUE n) {
   VALUE ret = INT2FIX(RSHIFT(n, 2));
 
