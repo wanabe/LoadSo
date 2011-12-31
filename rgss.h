@@ -137,6 +137,8 @@ enum ruby_value_type {
 #define SYMBOL_P(x) (((VALUE)(x)&~(~(VALUE)0<<RUBY_SPECIAL_SHIFT))==SYMBOL_FLAG)
 #define SPECIAL_CONST_P(x) (IMMEDIATE_P(x) || !RTEST(x))
 
+#define FIX2LONG(x) (long)RSHIFT((SIGNED_VALUE)(x),1)
+
 struct RBasic {
     VALUE flags;
     VALUE klass;

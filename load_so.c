@@ -30,6 +30,8 @@ VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 VALUE (*rb_f_public_send)(int argc, VALUE *argv, VALUE recv);
 VALUE (*rb_fix_lshift)(VALUE, VALUE);
 VALUE (*fix_and)(VALUE, VALUE);
+VALUE (*rb_f_integer)(int, VALUE*, VALUE);
+VALUE (*rb_big_to_s)(int, VALUE*, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
@@ -38,7 +40,7 @@ typedef VALUE (*cfunc)(ANYARGS);
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc;
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
-VALUE rb_cFixnum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
+VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
 
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
@@ -542,6 +544,28 @@ VALUE rb_int2big(SIGNED_VALUE n) {
   return fix_and(INT2FIX(n & 3), ret);
 }
 
+SIGNED_VALUE rb_num2long(VALUE val) {
+  SIGNED_VALUE ret;
+  char *endptr;
+
+  val = rb_f_integer(1, &val, Qnil);
+  switch(TYPE(val)) {
+  case T_FIXNUM:
+    return FIX2LONG(val);
+  case T_BIGNUM:
+    val = rb_big_to_s(0, NULL, val);
+    ret = strtol(RSTRING_PTR(val), &endptr, 10);
+    if(!errno) {
+      return ret;
+    }
+    /* pass */
+  default:
+    rb_raise(rb_eArgError, "invalid value for NUM2LONG()");
+  }
+  /* not reached */
+  return 0;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -635,6 +659,10 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_fix_lshift = get_instance_method(rb_cFixnum, "<<");
   fix_and = get_instance_method(rb_cFixnum, "&");
+  rb_f_integer = get_global_func("Integer");
+
+  rb_cBignum = rb_const_get(rb_cObject, rb_intern("Bignum"));
+  rb_big_to_s = get_instance_method(rb_cBignum, "to_s");
 
   rb_define_global_function("load_so", load_so, 2);
 
