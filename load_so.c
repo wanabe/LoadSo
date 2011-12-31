@@ -42,6 +42,11 @@ VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_c
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
 VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
 
+static void set_buf_string2(const char *str, long len) {
+  buf_string.as.heap.ptr = (char*)str;
+  buf_string.as.heap.len = len;
+}
+
 static void set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
   buf_string.as.heap.len = strlen(str);
@@ -125,6 +130,11 @@ void rb_define_module_function(VALUE module, const char *name, VALUE (*func)(ANY
 
 void rb_define_global_function(const char *name, VALUE (*func)(ANYARGS), int argc) {
   rb_define_module_function(rb_mKernel, name, func, argc);
+}
+
+ID rb_intern2(const char *name, long len) {
+  set_buf_string2(name, len);
+  return SYM2ID(rb_str_intern(value_buf_string));
 }
 
 ID rb_intern(const char *name) {
