@@ -28,6 +28,8 @@ VALUE (*rb_str_concat)(VALUE, VALUE);
 VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 VALUE (*rb_f_public_send)(int argc, VALUE *argv, VALUE recv);
+VALUE (*rb_fix_lshift)(VALUE, VALUE);
+VALUE (*fix_and)(VALUE, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
@@ -533,6 +535,13 @@ void rb_gc_mark(VALUE ptr) {
   }
 }
 
+VALUE rb_int2big(SIGNED_VALUE n) {
+  VALUE ret = INT2FIX(RSHIFT(n, 2));
+
+  ret = rb_fix_lshift(ret, INT2FIX(2));
+  return fix_and(INT2FIX(n & 3), ret);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -623,6 +632,9 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   init_hash = rb_eval_string("$__loadso__init_hash = Hash.new");
 
   rb_f_public_send = get_instance_method(rb_cObject, "public_send");
+
+  rb_fix_lshift = get_instance_method(rb_cFixnum, "<<");
+  fix_and = get_instance_method(rb_cFixnum, "&");
 
   rb_define_global_function("load_so", load_so, 2);
 
