@@ -39,6 +39,14 @@ enum ruby_special_consts {
 
 #define INT2FIX(i) ((VALUE)(((SIGNED_VALUE)(i))<<1 | FIXNUM_FLAG))
 
+#define FL_SINGLETON FL_USER0
+#define FL_MARK      (((VALUE)1)<<5)
+#define FL_RESERVED  (((VALUE)1)<<6) /* will be used in the future GC */
+#define FL_FINALIZE  (((VALUE)1)<<7)
+#define FL_TAINT     (((VALUE)1)<<8)
+#define FL_UNTRUSTED (((VALUE)1)<<9)
+#define FL_EXIVAR    (((VALUE)1)<<10)
+#define FL_FREEZE    (((VALUE)1)<<11)
 #define FL_USHIFT    12
 #define FL_USER0     (((VALUE)1)<<(FL_USHIFT+0))
 #define FL_USER1     (((VALUE)1)<<(FL_USHIFT+1))
@@ -127,6 +135,7 @@ enum ruby_value_type {
 #define FIXNUM_P(f) (((SIGNED_VALUE)(f))&FIXNUM_FLAG)
 #define IMMEDIATE_P(x) ((VALUE)(x) & IMMEDIATE_MASK)
 #define SYMBOL_P(x) (((VALUE)(x)&~(~(VALUE)0<<RUBY_SPECIAL_SHIFT))==SYMBOL_FLAG)
+#define SPECIAL_CONST_P(x) (IMMEDIATE_P(x) || !RTEST(x))
 
 struct RBasic {
     VALUE flags;

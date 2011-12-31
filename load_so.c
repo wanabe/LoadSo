@@ -34,7 +34,8 @@ VALUE dummy_proc, init_hash;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc;
+VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
 VALUE rb_cFixnum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
 
 static void set_buf_string(const char *str) {
@@ -505,6 +506,33 @@ VALUE rb_funcall(VALUE recv, ID mid, int n, ...) {
   return rb_f_public_send(n + 1, ptr, recv);
 }
 
+void rb_gc_mark(VALUE ptr) {
+  register struct RBasic *obj;
+
+  obj = RBASIC(ptr);
+  if (SPECIAL_CONST_P(ptr)) return; /* special const not marked */
+  if (obj->flags == 0) return;       /* free cell */
+  if (obj->flags & FL_MARK) return;  /* already marked */
+  obj->flags |= FL_MARK;
+
+  /* TODO: objspace->heap.live_num should be incleased */
+  /* TODO: check stack_overflow */
+
+  /* TODO: mark ivar */
+  switch (BUILTIN_TYPE(obj)) {
+  case T_DATA:
+    if (RTYPEDDATA_P(obj)) {
+      RUBY_DATA_FUNC mark_func = RTYPEDDATA(obj)->type->function.dmark;
+      if (mark_func) (*mark_func)(DATA_PTR(obj));
+    } else {
+      if (RDATA(obj)->dmark) (*RDATA(obj)->dmark)(DATA_PTR(obj));
+    }
+    break;
+  default:
+    rb_raise(rb_eNotImpError, "mark %s is not implemented yet", BUILTIN_TYPE(obj));
+  }
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -561,6 +589,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_eLoadError = rb_const_get(rb_cObject, rb_intern("LoadError"));
   rb_eTypeError = rb_const_get(rb_cObject, rb_intern("TypeError"));
   rb_eArgError = rb_const_get(rb_cObject, rb_intern("ArgumentError"));
+  rb_eNotImpError = rb_const_get(rb_cObject, rb_intern("NotImplementedError"));
 
   rb_class_new_instance = get_method(rb_cObject, "new");
   rb_cModule = rb_const_get(rb_cObject, rb_intern("Module"));
