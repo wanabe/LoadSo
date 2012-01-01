@@ -598,6 +598,10 @@ void rb_define_alias(VALUE klass, const char *name1, const char *name2) {
   rb_mod_alias_method(klass, ID2SYM(rb_intern(name1)), ID2SYM(rb_intern(name2)));
 }
 
+void *ruby_xmalloc(size_t size) {
+  return malloc(size);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
