@@ -20,6 +20,7 @@ VALUE (*rb_mod_instance_method)(VALUE, VALUE);
 VALUE (*rb_mod_define_method)(int, VALUE*, VALUE);
 VALUE (*rb_mod_append_features)(VALUE, VALUE);
 VALUE (*rb_mod_name)(VALUE);
+VALUE (*rb_mod_alias_method)(VALUE, VALUE, VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
 VALUE (*rb_f_float)(VALUE, VALUE);
 VALUE (*rb_str_intern)(VALUE);
@@ -593,6 +594,10 @@ SIGNED_VALUE rb_num2long(VALUE val) {
   return 0;
 }
 
+void rb_define_alias(VALUE klass, const char *name1, const char *name2) {
+  rb_mod_alias_method(klass, ID2SYM(rb_intern(name1)), ID2SYM(rb_intern(name2)));
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -656,6 +661,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   /* rb_define_module */
 
   rb_mod_name = get_instance_method(rb_cModule, "name");
+  rb_mod_alias_method = get_instance_method(rb_cModule, "alias_method");
 
   rb_cClass = rb_const_get(rb_cObject, rb_intern("Class"));
   /* rb_define_class */
