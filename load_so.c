@@ -670,6 +670,11 @@ VALUE rb_string_value(volatile VALUE *ptr) {
   return *ptr;
 }
 
+char *rb_string_value_ptr(volatile VALUE *ptr) {
+  VALUE str = rb_string_value(ptr);
+  return RSTRING_PTR(str);
+}
+
 char *rb_string_value_cstr(volatile VALUE *ptr) {
   VALUE str = rb_string_value(ptr);
   char *s = RSTRING_PTR(str);
