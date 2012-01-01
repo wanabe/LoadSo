@@ -35,6 +35,7 @@ VALUE (*fix_and)(VALUE, VALUE);
 VALUE (*rb_f_integer)(int, VALUE*, VALUE);
 VALUE (*rb_big_to_s)(int, VALUE*, VALUE);
 VALUE (*get_default_internal)(VALUE);
+VALUE (*get_default_external)(VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
@@ -630,6 +631,14 @@ rb_encoding *rb_default_internal_encoding() {
   return rb_to_encoding(val);
 }
 
+rb_encoding *rb_default_external_encoding() {
+  VALUE val = get_default_external(rb_cEncoding);
+  if (NIL_P(val)) {
+    return NULL;
+  }
+  return rb_to_encoding(val);
+}
+
 VALUE rb_sprintf(const char *format, ...) {
   VALUE result;
   va_list ap;
@@ -782,6 +791,7 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_cEncoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
   get_default_internal = get_method(rb_cEncoding, "default_internal");
+  get_default_external = get_method(rb_cEncoding, "default_external");
 
   rb_define_global_function("load_so", load_so, 2);
 
