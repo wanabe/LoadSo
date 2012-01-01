@@ -39,15 +39,17 @@ VALUE (*get_default_external)(VALUE);
 VALUE (*enc_replicate)(VALUE, VALUE);
 VALUE (*enc_list)(VALUE);
 VALUE (*enc_find)(VALUE, VALUE);
+VALUE (*rb_gc_start)();
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
-VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc;
+VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
 VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding;
+VALUE rb_mGC;
 
 static void set_buf_string2(const char *str, long len) {
   buf_string.as.heap.ptr = (char*)str;
@@ -828,6 +830,11 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   enc_replicate = get_instance_method(rb_cEncoding, "replicate");
   enc_list = get_method(rb_cEncoding, "list");
   enc_find = get_method(rb_cEncoding, "find");
+
+  rb_mGC = rb_const_get(rb_cObject, rb_intern("GC"));
+  rb_gc_start = get_method(rb_mGC, "start");
+
+  rb_cData = rb_const_get(rb_cObject, rb_intern("Data"));
 
   rb_define_global_function("load_so", load_so, 2);
 
