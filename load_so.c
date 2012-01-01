@@ -42,7 +42,7 @@ typedef VALUE (*cfunc)(ANYARGS);
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc;
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
-VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
+VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime;
 
 static void set_buf_string2(const char *str, long len) {
   buf_string.as.heap.ptr = (char*)str;
@@ -708,6 +708,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_big_to_s = get_instance_method(rb_cBignum, "to_s");
 
   rb_obj_is_kind_of_ = get_global_func("kind_of?");
+
+  rb_cTime = rb_const_get(rb_cObject, rb_intern("Time"));
 
   rb_define_global_function("load_so", load_so, 2);
 
