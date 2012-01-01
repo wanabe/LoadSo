@@ -649,6 +649,29 @@ VALUE rb_sprintf(const char *format, ...) {
   return result;
 }
 
+VALUE rb_string_value(volatile VALUE *ptr) {
+  if (TYPE(*ptr) != T_STRING) {
+    VALUE sym = ID2SYM(rb_intern("to_str"));
+    *ptr = rb_f_public_send(1, &sym, *ptr);
+  }
+  return *ptr;
+}
+
+char *rb_string_value_cstr(volatile VALUE *ptr) {
+  VALUE str = rb_string_value(ptr);
+  char *s = RSTRING_PTR(str);
+  long len = RSTRING_LEN(str);
+
+  if (!s || memchr(s, 0, len)) {
+    rb_raise(rb_eArgError, "string contains null byte");
+  }
+  if (s[len]) {
+    rb_str_cat(str, "\0", 1);
+    s = RSTRING_PTR(str);
+  }
+  return s;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 

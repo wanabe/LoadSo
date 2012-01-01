@@ -168,6 +168,15 @@ struct RString {
     } as;
 };
 #define RSTRING_NOEMBED FL_USER1
+#define RSTRING_EMBED_LEN_MASK (FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6)
+#define RSTRING_EMBED_LEN_SHIFT (FL_USHIFT+2)
+#define RSTRING_EMBED_LEN(str) \
+     (long)((RBASIC(str)->flags >> RSTRING_EMBED_LEN_SHIFT) & \
+            (RSTRING_EMBED_LEN_MASK >> RSTRING_EMBED_LEN_SHIFT))
+#define RSTRING_LEN(str) \
+    (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
+     RSTRING_EMBED_LEN(str) : \
+     RSTRING(str)->as.heap.len)
 #define RSTRING_PTR(str) \
     (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
      RSTRING(str)->as.ary : \
@@ -370,7 +379,7 @@ struct METHOD {
 
 #define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
 
-typedef void *rb_encoding;
+typedef void rb_encoding;
 
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
