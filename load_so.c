@@ -22,6 +22,7 @@ VALUE (*rb_mod_append_features)(VALUE, VALUE);
 VALUE (*rb_mod_name)(VALUE);
 VALUE (*rb_mod_alias_method)(VALUE, VALUE, VALUE);
 VALUE (*rb_class_new_instance)(int, VALUE*, VALUE);
+VALUE (*rb_obj_is_kind_of_)(VALUE, VALUE);
 VALUE (*rb_f_float)(VALUE, VALUE);
 VALUE (*rb_str_intern)(VALUE);
 VALUE (*rb_str_plus)(VALUE, VALUE);
@@ -602,6 +603,11 @@ void *ruby_xmalloc(size_t size) {
   return malloc(size);
 }
 
+VALUE rb_obj_is_kind_of(VALUE obj, VALUE c) {
+  VALUE ret = rb_obj_is_kind_of_(obj, c);
+  return ret;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -700,6 +706,8 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_cBignum = rb_const_get(rb_cObject, rb_intern("Bignum"));
   rb_big_to_s = get_instance_method(rb_cBignum, "to_s");
+
+  rb_obj_is_kind_of_ = get_global_func("kind_of?");
 
   rb_define_global_function("load_so", load_so, 2);
 
