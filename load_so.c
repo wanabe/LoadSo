@@ -672,6 +672,11 @@ char *rb_string_value_cstr(volatile VALUE *ptr) {
   return s;
 }
 
+int rb_enc_find_index(const char *name) {
+  /* TODO: STUB */
+  return -1;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
