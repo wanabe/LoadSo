@@ -630,6 +630,25 @@ rb_encoding *rb_default_internal_encoding() {
   return rb_to_encoding(val);
 }
 
+VALUE rb_sprintf(const char *format, ...) {
+  VALUE result;
+  va_list ap;
+  char *buf;
+  long len;
+
+  va_start(ap, format);
+
+  len = vsnprintf(NULL, 0, format, ap);
+  buf = (char*)malloc(len + 1);
+  vsnprintf(buf, len, format, ap);
+  result = rb_str_new(buf, len);
+  free(buf);
+
+  va_end(ap);
+
+  return result;
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
