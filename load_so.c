@@ -217,7 +217,7 @@ VALUE rb_ary_new3(long n, ...) {
 }
 
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
-  buf_string.as.heap.ptr = (char*)str;
+  buf_string.as.heap.ptr = ptr;
   buf_string.as.heap.len = len;
   str = rb_str_concat(str, value_buf_string);
   return str;
