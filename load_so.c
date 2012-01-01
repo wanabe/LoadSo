@@ -715,6 +715,10 @@ rb_encoding *rb_enc_from_index(int index) {
   return rb_to_encoding(RARRAY_PTR(list)[index]);
 }
 
+void *ruby_xmalloc2(size_t n, size_t size) {
+  return malloc(n * size);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
