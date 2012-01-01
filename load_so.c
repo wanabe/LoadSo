@@ -34,6 +34,7 @@ VALUE (*rb_fix_lshift)(VALUE, VALUE);
 VALUE (*fix_and)(VALUE, VALUE);
 VALUE (*rb_f_integer)(int, VALUE*, VALUE);
 VALUE (*rb_big_to_s)(int, VALUE*, VALUE);
+VALUE (*get_default_internal)(VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
@@ -42,7 +43,7 @@ typedef VALUE (*cfunc)(ANYARGS);
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc;
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
-VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime;
+VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding;
 
 static void set_buf_string2(const char *str, long len) {
   buf_string.as.heap.ptr = (char*)str;
@@ -608,6 +609,27 @@ VALUE rb_obj_is_kind_of(VALUE obj, VALUE c) {
   return ret;
 }
 
+static int enc_check_encoding(VALUE obj) {
+  if (SPECIAL_CONST_P(obj) || CLASS_OF(obj) != rb_cEncoding) {
+    return -1;
+  }
+  return 0;
+}
+
+rb_encoding *rb_to_encoding(VALUE enc) {
+  if (enc_check_encoding(enc) >= 0) return RDATA(enc)->data;
+  rb_raise(rb_eNotImpError, "rb_to_encoding(not_encoding) is not implemented yet.");
+  return NULL;
+}
+
+rb_encoding *rb_default_internal_encoding() {
+  VALUE val = get_default_internal(rb_cEncoding);
+  if (NIL_P(val)) {
+    return NULL;
+  }
+  return rb_to_encoding(val);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -710,6 +732,9 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_obj_is_kind_of_ = get_global_func("kind_of?");
 
   rb_cTime = rb_const_get(rb_cObject, rb_intern("Time"));
+
+  rb_cEncoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
+  get_default_internal = get_method(rb_cEncoding, "default_internal");
 
   rb_define_global_function("load_so", load_so, 2);
 

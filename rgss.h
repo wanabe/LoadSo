@@ -370,6 +370,8 @@ struct METHOD {
 
 #define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
 
+typedef void *rb_encoding;
+
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
 ID rb_intern(const char*);
