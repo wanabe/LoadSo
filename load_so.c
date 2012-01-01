@@ -36,6 +36,9 @@ VALUE (*rb_f_integer)(int, VALUE*, VALUE);
 VALUE (*rb_big_to_s)(int, VALUE*, VALUE);
 VALUE (*get_default_internal)(VALUE);
 VALUE (*get_default_external)(VALUE);
+VALUE (*enc_replicate)(VALUE, VALUE);
+VALUE (*enc_list)(VALUE);
+VALUE (*enc_find)(VALUE, VALUE);
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 VALUE dummy_proc, init_hash;
@@ -51,9 +54,10 @@ static void set_buf_string2(const char *str, long len) {
   buf_string.as.heap.len = len;
 }
 
-static void set_buf_string(const char *str) {
+static VALUE set_buf_string(const char *str) {
   buf_string.as.heap.ptr = (char*)str;
   buf_string.as.heap.len = strlen(str);
+  return value_buf_string;
 }
 
 inline cfunc get_method_with_func(cfunc func, VALUE obj, char *name) {
@@ -218,7 +222,7 @@ VALUE rb_ary_new3(long n, ...) {
 }
 
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
-  buf_string.as.heap.ptr = ptr;
+  buf_string.as.heap.ptr = (char*)ptr;
   buf_string.as.heap.len = len;
   str = rb_str_concat(str, value_buf_string);
   return str;
@@ -686,6 +690,26 @@ int rb_enc_find_index(const char *name) {
   return -1;
 }
 
+VALUE rb_ascii8bit_encoding() {
+  return enc_find(rb_cEncoding, set_buf_string("ascii-8bit"));
+}
+
+int rb_define_dummy_encoding(const char *name) {
+  VALUE enc, list;
+  enc = rb_ascii8bit_encoding();
+  enc = enc_replicate(enc, set_buf_string(name));
+  list = enc_list(rb_cEncoding);
+  if(RARRAY_PTR(list)[RARRAY_LEN(list) - 1] != enc) {
+    rb_raise(rb_eRuntimeError, "Can't define encoding");
+  }
+  return RARRAY_LEN(list) - 1;
+}
+
+rb_encoding *rb_enc_from_index(int index) {
+  VALUE list = enc_list(rb_cEncoding);
+  return rb_to_encoding(RARRAY_PTR(list)[index]);
+}
+
 int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   struct METHOD *method;
 
@@ -792,6 +816,9 @@ int Init_LoadSo(VALUE vmethod, VALUE cObject) {
   rb_cEncoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
   get_default_internal = get_method(rb_cEncoding, "default_internal");
   get_default_external = get_method(rb_cEncoding, "default_external");
+  enc_replicate = get_instance_method(rb_cEncoding, "replicate");
+  enc_list = get_method(rb_cEncoding, "list");
+  enc_find = get_method(rb_cEncoding, "find");
 
   rb_define_global_function("load_so", load_so, 2);
 
