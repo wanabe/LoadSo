@@ -1,5 +1,4 @@
 #include "load_so.h"
-#include "st.h"
 
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
