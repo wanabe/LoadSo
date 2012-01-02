@@ -206,17 +206,6 @@ VALUE rb_funcall3(VALUE recv, ID mid, int argc, const VALUE *argv) {
   return rb_f_public_send(argc + 1, ptr, recv);
 }
 
-static int mark_keyvalue(VALUE key, VALUE value, st_data_t data) {
-  rb_gc_mark(key);
-  rb_gc_mark(value);
-  return ST_CONTINUE;
-}
-
-void rb_mark_hash(st_table *tbl) {
-  if (!tbl) return;
-  st_foreach(tbl, mark_keyvalue, 0);
-}
-
 VALUE rb_int2big(SIGNED_VALUE n) {
   VALUE ret = INT2FIX(RSHIFT(n, 2));
 
