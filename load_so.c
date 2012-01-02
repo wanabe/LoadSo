@@ -19,9 +19,10 @@ VALUE (*fix_and)(VALUE, VALUE);
 VALUE (*rb_f_integer)(int, VALUE*, VALUE);
 VALUE (*rb_big_to_s)(int, VALUE*, VALUE);
 VALUE (*rb_gc_start)();
+
 struct RString buf_string = {{0x2005, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
-VALUE init_hash;
+const struct st_hash_type *ptr_objhash;
 
 typedef VALUE (*cfunc)(ANYARGS);
 
@@ -189,7 +190,7 @@ VALUE rb_hash_new() {
 
 struct st_table *rb_hash_tbl(VALUE hash) {
   if (!RHASH(hash)->ntbl) {
-    RHASH(hash)->ntbl = st_init_table(RHASH(init_hash)->ntbl->type);
+    RHASH(hash)->ntbl = st_init_table(ptr_objhash);
   }
   return RHASH(hash)->ntbl;
 }
@@ -349,7 +350,7 @@ void Init_LoadSo(VALUE vmethod, VALUE cObject) {
 
   rb_ary_join_m = get_instance_method(rb_cArray, "join");
 
-  init_hash = rb_eval_string("$__loadso__init_hash = Hash.new");
+  ptr_objhash = RHASH(rb_class_new_instance(0, NULL, rb_cHash))->ntbl->type;
 
   rb_f_public_send = get_instance_method(rb_cObject, "public_send");
 
