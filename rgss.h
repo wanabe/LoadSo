@@ -381,6 +381,8 @@ VALUE rb_eval_string(const char*);
 VALUE rb_class_new_instance(int, VALUE*, VALUE);
 void rb_define_global_function(const char*, VALUE (*)(ANYARGS), int);
 VALUE rb_funcall3(VALUE, ID, int, const VALUE*);
+void rb_gc_mark(VALUE);
+VALUE rb_ary_push(VALUE, VALUE);
 
 extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
 extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
