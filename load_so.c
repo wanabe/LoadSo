@@ -108,17 +108,18 @@ struct st_table *rb_hash_tbl(VALUE hash) {
 VALUE rb_funcall(VALUE recv, ID mid, int n, ...) {
   va_list ar;
   int i;
-  VALUE ary = INT2FIX(n + 1), *ptr;
+  VALUE ary = INT2FIX(n + 2), *ptr;
 
   ary = rb_class_new_instance(1, &ary, rb_cArray);
   ptr = RARRAY_PTR(ary);
-  ptr[0] = ID2SYM(mid);
+  ptr[0] = ID2SYM(rb_intern("__send__"));
+  ptr[1] = ID2SYM(mid);
   va_init_list(ar, n);
-  for (i = 1; i <= n; i++) {
+  for (i = 2; i < n + 2; i++) {
     ptr[i] = va_arg(ar, VALUE);
   }
   va_end(ar);
-  return rb_f_public_send(n + 1, ptr, recv);
+  return rb_f_public_send(n + 2, ptr, recv);
 }
 
 VALUE rb_funcall3(VALUE recv, ID mid, int argc, const VALUE *argv) {
