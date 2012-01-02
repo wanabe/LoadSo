@@ -363,10 +363,22 @@ struct METHOD {
     ID id;
     rb_method_entry_t me;
 };
-
 #define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
+typedef void rb_encoding; /* TODO */
 
-typedef void rb_encoding;
+typedef void rb_vm_t; /* TODO */
+typedef void rb_control_frame_t; /* TODO */
+typedef struct rb_thread_struct {
+    VALUE self;
+    rb_vm_t *vm;
+
+    /* execution information */
+    VALUE *stack;		/* must free, must mark */
+    unsigned long stack_size;
+    rb_control_frame_t *cfp;
+    int safe_level;
+  /* TODO: rb_thread_t has more members */
+} rb_thread_t;
 
 VALUE rb_newobj(void);
 void rb_raise(VALUE, const char*,...);
@@ -389,8 +401,8 @@ VALUE rb_ary_push(VALUE, VALUE);
 VALUE rb_vsprintf(const char *format, va_list ap);
 
 extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
-extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
-extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding;
+extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError;
+extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;
 extern VALUE rb_mGC;
 
 static inline VALUE rb_class_of(VALUE obj) {

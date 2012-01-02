@@ -42,6 +42,7 @@ void Init_Array();
 void Init_ObjSpace();
 void Init_Eval();
 void Init_Hash();
+void Init_Thread();
 
 void Init_LoadSo(VALUE vmethod, VALUE cObject) {
   LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
@@ -60,6 +61,7 @@ void Init_LoadSo(VALUE vmethod, VALUE cObject) {
   Init_Array();
   Init_ObjSpace();
   Init_Hash();
+  Init_Thread();
 
   rb_define_global_function("load_so", load_so, 2);
 }
