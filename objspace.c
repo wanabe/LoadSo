@@ -1,6 +1,8 @@
 #include "load_so.h"
 #include "st.h"
 
+static VALUE (*rb_gc_start)();
+
 VALUE rb_newobj() {
   return rb_class_new_instance(0, NULL, rb_cObject);
 }
@@ -77,4 +79,8 @@ static int mark_keyvalue(VALUE key, VALUE value, st_data_t data) {
 void rb_mark_hash(st_table *tbl) {
   if (!tbl) return;
   st_foreach(tbl, mark_keyvalue, 0);
+}
+
+void Init_ObjSpace() {
+  rb_gc_start = get_method(rb_mGC, "start");
 }
