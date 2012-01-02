@@ -11,10 +11,14 @@ Win32API.new("user32", "SetWindowLong", "iii", "").call(hwnd_dx, GWL_STYLE, (sty
 Win32API.new("user32", "SetParent", "ii", "").call(hwnd_dx, hwnd_rgss)
 
 font = DXRuby::Font.new(32)
+image = DXRuby::Image.new(100, 100)
+image.line(0, 0, 100, 100, [255, 255, 0, 0])
+
 $data_system = load_data("Data/System.rvdata2")
 
 DXRuby::Window.loop do
   DXRuby::Window.drawFont(100, 100, "this is written by DXRuby", font)
+  DXRuby::Window.draw(0, 64, image)
   Input.update
   $data_system.sounds[1].play if Input.repeat?(Input::C)
 end
