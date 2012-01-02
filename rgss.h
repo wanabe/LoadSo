@@ -290,24 +290,8 @@ static inline int rb_type(VALUE obj) {
   return BUILTIN_TYPE(obj);
 }
 #define TYPE(x) rb_type((VALUE)(x))
-
-extern VALUE rb_cObject, rb_cModule, rb_cString, rb_eRuntimeError;
-extern VALUE rb_cFixnum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass;
-static inline VALUE rb_class_of(VALUE obj) {
-  if (IMMEDIATE_P(obj)) {
-    if (FIXNUM_P(obj)) return rb_cFixnum;
-    if (obj == Qtrue)  return rb_cTrueClass;
-    if (SYMBOL_P(obj)) return rb_cSymbol;
-  }
-  else if (!RTEST(obj)) {
-    if (obj == Qnil)   return rb_cNilClass;
-    if (obj == Qfalse) return rb_cFalseClass;
-  }
-  return RBASIC(obj)->klass;
-}
 #define CLASS_OF(v) rb_class_of((VALUE)(v))
 
-VALUE rb_newobj(void);
 #define NEWOBJ(obj,type) type *(obj) = (type*)rb_newobj()
 #define OBJSETUP(obj,c,t) do {\
     RBASIC(obj)->flags = (t);\
@@ -381,6 +365,7 @@ struct METHOD {
 
 typedef void rb_encoding;
 
+VALUE rb_newobj(void);
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
 ID rb_intern(const char*);
@@ -388,3 +373,29 @@ VALUE rb_define_module_under(VALUE, const char*);
 VALUE rb_define_module(const char*);
 void rb_const_set(VALUE, ID, VALUE);
 void rb_define_singleton_method(VALUE, const char*, VALUE (*)(ANYARGS), int);
+VALUE rb_ary_new();
+VALUE rb_ary_new4(long, const VALUE*);
+int rb_block_given_p();
+VALUE rb_block_proc();
+VALUE rb_eval_string(const char*);
+VALUE rb_class_new_instance(int, VALUE*, VALUE);
+void rb_define_global_function(const char*, VALUE (*)(ANYARGS), int);
+VALUE rb_funcall3(VALUE, ID, int, const VALUE*);
+
+extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
+extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;
+extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding;
+extern VALUE rb_mGC;
+
+static inline VALUE rb_class_of(VALUE obj) {
+  if (IMMEDIATE_P(obj)) {
+    if (FIXNUM_P(obj)) return rb_cFixnum;
+    if (obj == Qtrue)  return rb_cTrueClass;
+    if (SYMBOL_P(obj)) return rb_cSymbol;
+  }
+  else if (!RTEST(obj)) {
+    if (obj == Qnil)   return rb_cNilClass;
+    if (obj == Qfalse) return rb_cFalseClass;
+  }
+  return RBASIC(obj)->klass;
+}
