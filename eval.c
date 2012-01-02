@@ -13,11 +13,13 @@ void rb_p(VALUE obj) {
   rb_f_p(1, &obj, Qnil);
 }
 
-void rb_raise(VALUE exc, const char *msg,...) {
-  VALUE v[2] = {exc, value_buf_string};
+void rb_raise(VALUE exc, const char *format,...) {
+  VALUE v[2] = {exc};
+  va_list ap;
 
-  /* TODO: va_args */
-  set_buf_string(msg);
+  va_start(ap, format);
+  v[1] = rb_vsprintf(format, ap);
+  va_end(ap);
   rb_f_raise(2, v);
 }
 
