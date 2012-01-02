@@ -11,13 +11,11 @@ static VALUE (*enc_list)(VALUE);
 static VALUE (*enc_find)(VALUE, VALUE);
 
 ID rb_intern2(const char *name, long len) {
-  set_buf_string2(name, len);
-  return SYM2ID(rb_str_intern(value_buf_string));
+  return SYM2ID(rb_str_intern(set_buf_string2(name, len)));
 }
 
 ID rb_intern(const char *name) {
-  set_buf_string(name);
-  return SYM2ID(rb_str_intern(value_buf_string));
+  return SYM2ID(rb_str_intern(set_buf_string(name)));
 }
 
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
@@ -33,8 +31,7 @@ VALUE rb_str_new(const char *ptr, long len) {
 
 VALUE rb_str_new_cstr(const char *ptr) {
   VALUE str = rb_class_new_instance(0, NULL, rb_cString);
-  set_buf_string(ptr);
-  str = rb_str_concat(str, value_buf_string);
+  str = rb_str_concat(str, set_buf_string(ptr));
   return str;
 }
 

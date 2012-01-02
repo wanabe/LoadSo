@@ -25,8 +25,7 @@ static inline cfunc get_method_with_func(cfunc func, VALUE obj, char *name) {
   VALUE vmethod;
   struct METHOD *method;
 
-  set_buf_string(name);
-  vmethod = func(obj, value_buf_string);
+  vmethod = func(obj, set_buf_string(name));
   method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
   return method->me.def->body.cfunc.func;
 }

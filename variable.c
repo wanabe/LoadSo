@@ -25,8 +25,7 @@ void rb_const_set(VALUE klass, ID id, VALUE val) {
 }
 
 void rb_define_const(VALUE klass, const char *name, VALUE val) {
-  set_buf_string(name);
-  rb_mod_const_set(klass, value_buf_string, val);
+  rb_mod_const_set(klass, set_buf_string(name), val);
 }
 
 void Init_VariableCore() {
