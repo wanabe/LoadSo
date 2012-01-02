@@ -2,6 +2,9 @@
   This file is made up of the part of Matz' Ruby Implementation.
   http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/branches/ruby_1_9_2/
 */
+
+#include <stdarg.h>
+
 #ifdef __cplusplus
 #define ANYARGS ...
 #else
@@ -383,6 +386,7 @@ void rb_define_global_function(const char*, VALUE (*)(ANYARGS), int);
 VALUE rb_funcall3(VALUE, ID, int, const VALUE*);
 void rb_gc_mark(VALUE);
 VALUE rb_ary_push(VALUE, VALUE);
+VALUE rb_vsprintf(const char *format, va_list ap);
 
 extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
 extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError;

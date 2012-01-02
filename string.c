@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "load_so.h"
+#include <stdio.h>
 
 static VALUE (*rb_str_intern)(VALUE);
 static VALUE (*rb_str_plus)(VALUE, VALUE);
@@ -38,13 +38,10 @@ VALUE rb_str_new_cstr(const char *ptr) {
   return str;
 }
 
-VALUE rb_sprintf(const char *format, ...) {
+VALUE rb_vsprintf(const char *format, va_list ap) {
   VALUE result;
-  va_list ap;
   char *buf;
   long len;
-
-  va_start(ap, format);
 
   len = vsnprintf(NULL, 0, format, ap);
   buf = (char*)malloc(len + 1);
@@ -52,8 +49,16 @@ VALUE rb_sprintf(const char *format, ...) {
   result = rb_str_new(buf, len);
   free(buf);
 
-  va_end(ap);
+  return result;
+}
 
+VALUE rb_sprintf(const char *format, ...) {
+  VALUE result;
+  va_list ap;
+
+  va_start(ap, format);
+  result = rb_vsprintf(format, ap);
+  va_end(ap);
   return result;
 }
 
