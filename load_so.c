@@ -50,10 +50,13 @@ void rb_raise(VALUE exc, const char *msg,...) {
   rb_f_raise(2, v);
 }
 
+VALUE rb_newobj() {
+  return rb_class_new_instance(0, NULL, rb_cObject);
+}
+
 VALUE rb_data_object_alloc(VALUE klass, void *datap, RUBY_DATA_FUNC dmark, RUBY_DATA_FUNC dfree) {
-  struct RData *data = (struct RData*)rb_class_new_instance(0, NULL, rb_cObject);
-  data->basic.klass = klass;
-  data->basic.flags = T_DATA;
+  NEWOBJ(data, struct RData);
+  OBJSETUP(data, klass, T_DATA);
   data->data = datap;
   data->dfree = dfree;
   data->dmark = dmark;
@@ -161,10 +164,6 @@ VALUE rb_ary_new4(long n, const VALUE *elts) {
 VALUE rb_ary_join(VALUE ary, VALUE sep) {
   rb_ary_join_m(1, &sep, ary);
   return rb_ary_join_m(1, &sep, ary);
-}
-
-VALUE rb_newobj() {
-  return rb_class_new_instance(0, NULL, rb_cObject);
 }
 
 VALUE rb_float_new(double d) {
