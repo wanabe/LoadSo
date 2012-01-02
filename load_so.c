@@ -1,6 +1,6 @@
 #include "load_so.h"
 
-struct RString buf_string = {{0x2005, 0}};
+struct RString buf_string = {{RSTRING_NOEMBED | T_STRING, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 
 VALUE set_buf_string2(const char *str, long len) {
