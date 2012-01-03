@@ -19,6 +19,19 @@ ID rb_intern(const char *name) {
   return SYM2ID(rb_str_intern(set_buf_string(name)));
 }
 
+ID rb_to_id(VALUE name) {
+  switch (TYPE(name)) {
+  default:
+    rb_raise(rb_eNotImpError, "TODO: rb_to_id(not_str_or_sym) is not implemented yet.");
+  case T_STRING:
+    name = rb_str_intern(name);
+    /* fall through */
+  case T_SYMBOL:
+    return SYM2ID(name);
+  }
+  return Qnil; /* not reached */
+}
+
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
   buf_string.as.heap.ptr = (char*)ptr;
   buf_string.as.heap.len = len;
