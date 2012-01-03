@@ -9,6 +9,7 @@ static VALUE (*get_default_external)(VALUE);
 static VALUE (*enc_replicate)(VALUE, VALUE);
 static VALUE (*enc_list)(VALUE);
 static VALUE (*enc_find)(VALUE, VALUE);
+static VALUE (*rb_obj_encoding)(VALUE obj);
 
 ID rb_intern2(const char *name, long len) {
   return SYM2ID(rb_str_intern(set_buf_string2(name, len)));
@@ -125,6 +126,10 @@ int rb_enc_find_index(const char *name) {
   return -1;
 }
 
+rb_encoding *rb_enc_get(VALUE obj) {
+  return rb_to_encoding(rb_obj_encoding(obj));
+}
+
 VALUE rb_ascii8bit_encoding() {
   return enc_find(rb_cEncoding, set_buf_string("ascii-8bit"));
 }
@@ -154,4 +159,5 @@ void Init_String() {
   enc_replicate = get_instance_method(rb_cEncoding, "replicate");
   enc_list = get_method(rb_cEncoding, "list");
   enc_find = get_method(rb_cEncoding, "find");
+  rb_obj_encoding = get_instance_method(rb_cString, "encoding");
 }
