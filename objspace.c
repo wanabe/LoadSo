@@ -40,7 +40,7 @@ void rb_gc_mark(VALUE ptr) {
     }
     break;
   default:
-    rb_raise(rb_eNotImpError, "mark %s is not implemented yet", BUILTIN_TYPE(obj));
+    rb_raise(rb_eNotImpError, "TODO: mark %s is not implemented yet", BUILTIN_TYPE(obj));
   }
 }
 

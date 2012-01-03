@@ -95,7 +95,7 @@ static int enc_check_encoding(VALUE obj) {
 
 rb_encoding *rb_to_encoding(VALUE enc) {
   if (enc_check_encoding(enc) >= 0) return RDATA(enc)->data;
-  rb_raise(rb_eNotImpError, "rb_to_encoding(not_encoding) is not implemented yet.");
+  rb_raise(rb_eNotImpError, "TODO: rb_to_encoding(not_encoding) is not implemented yet.");
   return NULL;
 }
 
