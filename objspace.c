@@ -52,13 +52,13 @@ static void gv_free(void *ptr) {
 }
 
 void rb_global_variable(VALUE *var) {
-  VALUE wrap, global_list = rb_eval_string("$__loadso__global_list ||= []");
+  VALUE wrap, global_list = rb_eval_string("$__loadso__global_list");
   wrap = rb_data_object_alloc(0, var, gv_mark, gv_free);
   rb_ary_push(global_list, wrap);
 }
 
 void rb_gc_register_mark_object(VALUE obj) {
-  VALUE global_list = rb_eval_string("$__loadso__global_list ||= []");
+  VALUE global_list = rb_eval_string("$__loadso__global_list");
   rb_ary_push(global_list, obj);
 }
 
@@ -82,5 +82,6 @@ void rb_mark_hash(st_table *tbl) {
 }
 
 void Init_ObjSpace() {
+  rb_eval_string("$__loadso__global_list = []");
   rb_gc_start = get_method(rb_mGC, "start");
 }
