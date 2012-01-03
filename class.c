@@ -42,6 +42,10 @@ cfunc get_instance_method(VALUE mod, char *name) {
   return get_method_with_func(rb_mod_instance_method, mod, name);
 }
 
+VALUE rb_instance_method(VALUE mod, ID id) {
+  return rb_mod_instance_method(mod, ID2SYM(id));
+}
+
 int rb_scan_args(int argc, const VALUE *argv, const char *fmt, ...) {
   int i;
   const char *p = fmt;

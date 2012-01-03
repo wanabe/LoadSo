@@ -147,12 +147,20 @@ struct RBasic {
     VALUE klass;
 };
 
+struct rb_classext_struct {
+    VALUE super;
+    struct st_table *iv_tbl;
+    struct st_table *const_tbl;
+};
+typedef struct rb_classext_struct rb_classext_t;
 struct RClass {
     struct RBasic basic;
-    /*rb_classext_t*/void *ptr;
+    rb_classext_t *ptr;
     struct st_table *m_tbl;
     struct st_table *iv_index_tbl;
 };
+#define RCLASS_EXT(c) (RCLASS(c)->ptr)
+#define RCLASS_SUPER(c) (RCLASS_EXT(c)->super)
 #define RCLASS_M_TBL(c) (RCLASS(c)->m_tbl)
 
 #define RSTRING_EMBED_LEN_MAX ((int)((sizeof(VALUE)*3)/sizeof(char)-1))
@@ -367,7 +375,19 @@ struct METHOD {
 typedef void rb_encoding; /* TODO */
 
 typedef void rb_vm_t; /* TODO */
-typedef void rb_control_frame_t; /* TODO */
+typedef struct {
+    VALUE *pc;			/* cfp[0] */
+    VALUE *sp;			/* cfp[1] */
+    VALUE *bp;			/* cfp[2] */
+    rb_iseq_t *iseq;		/* cfp[3] */
+    VALUE flag;			/* cfp[4] */
+    VALUE self;			/* cfp[5] / block[0] */
+    VALUE *lfp;			/* cfp[6] / block[1] */
+    VALUE *dfp;			/* cfp[7] / block[2] */
+    rb_iseq_t *block_iseq;	/* cfp[8] / block[3] */
+    VALUE proc;			/* cfp[9] / block[4] */
+    const rb_method_entry_t *me;/* cfp[10] */
+} rb_control_frame_t;
 typedef struct rb_thread_struct {
     VALUE self;
     rb_vm_t *vm;

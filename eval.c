@@ -8,6 +8,8 @@ static VALUE (*proc_call)(int, VALUE*, VALUE);
 static VALUE (*rb_f_block_given_p)();
 static VALUE (*rb_f_public_send)(int argc, VALUE *argv, VALUE recv);
 static VALUE (*rb_f_p)(int, VALUE*, VALUE);
+static VALUE (*umethod_bind)(VALUE, VALUE);
+static VALUE (*rb_method_call)(int, const VALUE*, VALUE);
 
 void rb_p(VALUE obj) {
   rb_f_p(1, &obj, Qnil);
@@ -86,6 +88,20 @@ VALUE rb_funcall3(VALUE recv, ID mid, int argc, const VALUE *argv) {
   return rb_f_public_send(argc + 1, ptr, recv);
 }
 
+VALUE rb_call_super(int argc, const VALUE *argv) {
+  rb_thread_t *th = GET_THREAD();
+  ID id = th->cfp->me->def->original_id;
+  VALUE method, klass = RCLASS_SUPER(th->cfp->me->klass);
+
+  if (klass == 0) {
+    rb_raise(rb_eNotImpError, "TODO: super can't find superclass. under construction.");
+  }
+  method = rb_instance_method(klass, id);
+  method = umethod_bind(method, th->cfp->self);
+  rb_p(method);
+  return rb_method_call(argc, argv, method);
+}
+
 void Init_Eval() {
   rb_f_eval = get_global_func("eval");
   rb_f_raise = get_global_func("raise");
@@ -93,5 +109,7 @@ void Init_Eval() {
   proc_call = get_instance_method(rb_cProc, "call");
   rb_f_block_given_p = get_global_func("block_given?");
   rb_f_public_send = get_instance_method(rb_cObject, "public_send");
+  umethod_bind = get_instance_method(rb_cUnboundMethod, "bind");
+  rb_method_call = get_instance_method(rb_cMethod, "call");
   rb_f_p = get_global_func("p");
 }
