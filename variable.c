@@ -8,6 +8,7 @@ VALUE rb_mGC;
 
 static VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
 static VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
+static ID tLAST_TOKEN;
 
 VALUE rb_const_get(VALUE klass, ID id) {
   VALUE sym = ID2SYM(id);
@@ -27,6 +28,16 @@ void rb_const_set(VALUE klass, ID id, VALUE val) {
 
 void rb_define_const(VALUE klass, const char *name, VALUE val) {
   rb_mod_const_set(klass, set_buf_string(name), val);
+}
+
+#define ID_SCOPE_MASK 0x07
+#define ID_CONST 0x05
+#define is_notop_id(id) ((id)>tLAST_TOKEN)
+#define is_const_id(id) (is_notop_id(id)&&((id)&ID_SCOPE_MASK)==ID_CONST)
+
+int rb_is_const_id(ID id) {
+  int retval = is_const_id(id);
+  return retval;
 }
 
 void Init_VariableCore() {
@@ -65,4 +76,5 @@ void Init_VariableCore() {
 
 void Init_Variable() {
   rb_mod_const_set = get_method(rb_cObject, "const_set");
+  tLAST_TOKEN = rb_intern("core#set_postexe") + 10;
 }
