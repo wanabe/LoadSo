@@ -98,7 +98,6 @@ VALUE rb_call_super(int argc, const VALUE *argv) {
   }
   method = rb_instance_method(klass, id);
   method = umethod_bind(method, th->cfp->self);
-  rb_p(method);
   return rb_method_call(argc, argv, method);
 }
 
