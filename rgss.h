@@ -139,6 +139,9 @@ enum ruby_value_type {
 #define IMMEDIATE_P(x) ((VALUE)(x) & IMMEDIATE_MASK)
 #define SYMBOL_P(x) (((VALUE)(x)&~(~(VALUE)0<<RUBY_SPECIAL_SHIFT))==SYMBOL_FLAG)
 #define SPECIAL_CONST_P(x) (IMMEDIATE_P(x) || !RTEST(x))
+#define FL_ABLE(x) (!SPECIAL_CONST_P(x) && BUILTIN_TYPE(x) != T_NODE)
+#define FL_TEST(x,f) (FL_ABLE(x)?(RBASIC(x)->flags&(f)):0)
+#define OBJ_TAINTED(x) (!!FL_TEST((x), FL_TAINT))
 
 #define FIX2LONG(x) (long)RSHIFT((SIGNED_VALUE)(x),1)
 

@@ -27,6 +27,17 @@ void rb_secure(int level) {
   }
 }
 
+void rb_insecure_operation(void) {
+  rb_raise(rb_eSecurityError, "Insecure operation");
+}
+
+void rb_check_safe_obj(VALUE x) {
+  if (rb_safe_level() > 0 && OBJ_TAINTED(x)) {
+    rb_insecure_operation();
+  }
+  rb_secure(4);
+}
+
 void Init_Thread() {
   thread_s_current = get_method(rb_cThread, "current");
   ptr_ruby_thread_data_type = RTYPEDDATA_TYPE(rb_thread_current());
