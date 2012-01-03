@@ -380,7 +380,7 @@ typedef struct rb_thread_struct {
   /* TODO: rb_thread_t has more members */
 } rb_thread_t;
 
-VALUE rb_newobj(void);
+VALUE rb_newobj();
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
 ID rb_intern(const char*);

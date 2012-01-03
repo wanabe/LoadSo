@@ -7,7 +7,7 @@
 static VALUE (*thread_s_current)(VALUE);
 static const rb_data_type_t *ptr_ruby_thread_data_type;
 
-VALUE rb_thread_current(void) {
+VALUE rb_thread_current() {
   return thread_s_current(rb_cThread);
 }
 
@@ -17,7 +17,7 @@ static rb_thread_t *get_thread(VALUE thread) {
   return th;
 }
 
-int rb_safe_level(void) {
+int rb_safe_level() {
   return GET_THREAD()->safe_level;
 }
 
