@@ -3,6 +3,7 @@
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError;
 VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;
+VALUE rb_cMethod, rb_cUnboundMethod;
 VALUE rb_mGC;
 
 static VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
@@ -45,6 +46,8 @@ void Init_VariableCore() {
   rb_cHash = const_get_cstr(rb_cObject, "Hash");
   rb_cString = const_get_cstr(rb_cObject, "String");
   rb_cProc = const_get_cstr(rb_cObject, "Proc");
+  rb_cMethod = const_get_cstr(rb_cObject, "Method");
+  rb_cUnboundMethod = const_get_cstr(rb_cObject, "UnboundMethod");
   rb_cThread = const_get_cstr(rb_cObject, "Thread");
   rb_cFloat = const_get_cstr(rb_cObject, "Float");
   rb_cBignum = const_get_cstr(rb_cObject, "Bignum");
