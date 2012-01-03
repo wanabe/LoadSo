@@ -1,6 +1,5 @@
 #include "load_so.h"
 
-#define GET_THREAD() get_thread(rb_thread_current())
 #define GetThreadPtr(obj, ptr) \
     TypedData_Get_Struct((obj), rb_thread_t, ptr_ruby_thread_data_type, (ptr))
 
@@ -11,7 +10,7 @@ VALUE rb_thread_current() {
   return thread_s_current(rb_cThread);
 }
 
-static rb_thread_t *get_thread(VALUE thread) {
+rb_thread_t *get_thread(VALUE thread) {
   rb_thread_t *th;
   GetThreadPtr(thread, th);
   return th;
