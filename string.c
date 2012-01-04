@@ -3,7 +3,7 @@
 
 static VALUE (*rb_str_intern)(VALUE);
 static VALUE (*rb_str_plus)(VALUE, VALUE);
-static VALUE (*rb_str_concat)(VALUE, VALUE);
+static VALUE (*rb_str_concat_)(VALUE, VALUE);
 static VALUE (*rb_str_cmp_m)(VALUE, VALUE);
 static VALUE (*rb_f_string)(VALUE, VALUE);
 static VALUE (*rb_sym_to_s)(VALUE);
@@ -18,7 +18,13 @@ static VALUE (*rb_str_force_encoding)(VALUE, VALUE);
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
   buf_string.as.heap.ptr = (char*)ptr;
   buf_string.as.heap.len = len;
-  str = rb_str_concat(str, value_buf_string);
+  str = rb_str_concat_(str, value_buf_string);
+  return str;
+}
+
+VALUE rb_str_cat2(VALUE str, const char *ptr) {
+  set_buf_string((char*)ptr);
+  str = rb_str_concat_(str, value_buf_string);
   return str;
 }
 
@@ -28,7 +34,7 @@ VALUE rb_str_new(const char *ptr, long len) {
 
 VALUE rb_str_new_cstr(const char *ptr) {
   VALUE str = rb_class_new_instance(0, NULL, rb_cString);
-  str = rb_str_concat(str, set_buf_string(ptr));
+  str = rb_str_concat_(str, set_buf_string(ptr));
   return str;
 }
 
@@ -89,6 +95,14 @@ char *rb_string_value_cstr(volatile VALUE *ptr) {
 
 int rb_str_cmp(VALUE str1, VALUE str2) {
   return FIX2LONG(rb_str_cmp_m(str1, str2));
+}
+
+VALUE rb_str_append(VALUE str, VALUE str2) {
+  return rb_str_concat_(str, str2);
+}
+
+VALUE rb_str_concat(VALUE str, VALUE str2) {
+  return rb_str_concat_(str, str2);
 }
 
 VALUE rb_String(VALUE val) {
@@ -200,7 +214,7 @@ void Init_StringCore() {
 
 void Init_String() {
   rb_str_plus = get_instance_method(rb_cString, "+");
-  rb_str_concat = get_instance_method(rb_cString, "concat");
+  rb_str_concat_ = get_instance_method(rb_cString, "concat");
   rb_str_cmp_m = get_instance_method(rb_cString, "<=>");
   rb_f_string = get_global_func("String");
 
