@@ -4,33 +4,13 @@
 static VALUE (*rb_str_intern)(VALUE);
 static VALUE (*rb_str_plus)(VALUE, VALUE);
 static VALUE (*rb_str_concat)(VALUE, VALUE);
+static VALUE (*rb_sym_to_s)(VALUE);
 static VALUE (*get_default_internal)(VALUE);
 static VALUE (*get_default_external)(VALUE);
 static VALUE (*enc_replicate)(VALUE, VALUE);
 static VALUE (*enc_list)(VALUE);
 static VALUE (*enc_find)(VALUE, VALUE);
 static VALUE (*rb_obj_encoding)(VALUE obj);
-
-ID rb_intern2(const char *name, long len) {
-  return SYM2ID(rb_str_intern(set_buf_string2(name, len)));
-}
-
-ID rb_intern(const char *name) {
-  return SYM2ID(rb_str_intern(set_buf_string(name)));
-}
-
-ID rb_to_id(VALUE name) {
-  switch (TYPE(name)) {
-  default:
-    rb_raise(rb_eNotImpError, "TODO: rb_to_id(not_str_or_sym) is not implemented yet.");
-  case T_STRING:
-    name = rb_str_intern(name);
-    /* fall through */
-  case T_SYMBOL:
-    return SYM2ID(name);
-  }
-  return Qnil; /* not reached */
-}
 
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
   buf_string.as.heap.ptr = (char*)ptr;
@@ -100,6 +80,38 @@ char *rb_string_value_cstr(volatile VALUE *ptr) {
   return s;
 }
 
+ID rb_intern2(const char *name, long len) {
+  return SYM2ID(rb_str_intern(set_buf_string2(name, len)));
+}
+
+ID rb_intern(const char *name) {
+  return SYM2ID(rb_str_intern(set_buf_string(name)));
+}
+
+ID rb_to_id(VALUE name) {
+  switch (TYPE(name)) {
+  default:
+    rb_raise(rb_eNotImpError, "TODO: rb_to_id(not_str_or_sym) is not implemented yet.");
+  case T_STRING:
+    name = rb_str_intern(name);
+    /* fall through */
+  case T_SYMBOL:
+    return SYM2ID(name);
+  }
+  return Qnil; /* not reached */
+}
+
+VALUE rb_id2str(ID id) {
+  return rb_sym_to_s(ID2SYM(id));
+}
+
+const char *rb_id2name(ID id) {
+  VALUE str = rb_id2str(id);
+
+  if (!str) return 0;
+  return RSTRING_PTR(str);
+}
+
 static int enc_check_encoding(VALUE obj) {
   if (SPECIAL_CONST_P(obj) || CLASS_OF(obj) != rb_cEncoding) {
     return -1;
@@ -166,6 +178,8 @@ void Init_StringCore() {
 void Init_String() {
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_str_concat = get_instance_method(rb_cString, "concat");
+
+  rb_sym_to_s = get_instance_method(rb_cSymbol, "to_s");
 
   get_default_internal = get_method(rb_cEncoding, "default_internal");
   get_default_external = get_method(rb_cEncoding, "default_external");
