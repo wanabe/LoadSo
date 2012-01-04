@@ -30,6 +30,10 @@ VALUE rb_str_new_cstr(const char *ptr) {
   return str;
 }
 
+int ruby_vsnprintf(char *str, size_t n, const char *fmt, va_list ap) {
+  return vsnprintf(str, n, fmt, ap);
+}
+
 VALUE rb_vsprintf(const char *format, va_list ap) {
   VALUE result;
   char *buf;
