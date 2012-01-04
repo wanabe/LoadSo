@@ -8,7 +8,20 @@ VALUE rb_mGC;
 
 static VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
 static VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
+static VALUE (*rb_obj_ivar_set)(VALUE, VALUE, VALUE);
 static ID tLAST_TOKEN;
+
+#define ID_SCOPE_MASK 0x07
+#define ID_INSTANCE   0x01
+#define ID_CONST      0x05
+#define is_notop_id(id)    ((id)>tLAST_TOKEN)
+#define is_instance_id(id) (is_notop_id(id)&&((id)&ID_SCOPE_MASK)==ID_INSTANCE)
+#define is_const_id(id)    (is_notop_id(id)&&((id)&ID_SCOPE_MASK)==ID_CONST)
+
+int rb_is_const_id(ID id) {
+  int retval = is_const_id(id);
+  return retval;
+}
 
 VALUE rb_const_get(VALUE klass, ID id) {
   VALUE sym = ID2SYM(id);
@@ -30,14 +43,24 @@ void rb_define_const(VALUE klass, const char *name, VALUE val) {
   rb_mod_const_set(klass, set_buf_string(name), val);
 }
 
-#define ID_SCOPE_MASK 0x07
-#define ID_CONST 0x05
-#define is_notop_id(id) ((id)>tLAST_TOKEN)
-#define is_const_id(id) (is_notop_id(id)&&((id)&ID_SCOPE_MASK)==ID_CONST)
-
-int rb_is_const_id(ID id) {
-  int retval = is_const_id(id);
-  return retval;
+VALUE rb_ivar_set(VALUE obj, ID id, VALUE val) {
+  VALUE ivar_table, inner_table;
+  if(is_instance_id(id)) {
+    return rb_obj_ivar_set(obj, ID2SYM(id), val);
+  }
+  switch (TYPE(obj)) {
+  case T_OBJECT:
+  case T_CLASS:
+  case T_MODULE:
+    rb_raise(rb_eNotImpError, "TODO: rb_ivar_set(obj_or_class_or_mod, :not_ivar_name, val) is not implemented yet.");
+  }
+  ivar_table = rb_eval_string("$__loadso__ivar_table");
+  inner_table = rb_hash_aref(ivar_table, obj);
+  if(!inner_table) {
+    inner_table = rb_hash_new();
+    rb_hash_aset(ivar_table, obj, inner_table);
+  }
+  rb_hash_aset(inner_table, ID2SYM(id), val);
 }
 
 void Init_VariableCore() {
@@ -76,6 +99,8 @@ void Init_VariableCore() {
 }
 
 void Init_Variable() {
+  VALUE ivar_table = rb_eval_string("$__loadso__ivar_table = Hash.new(false)");
   rb_mod_const_set = get_method(rb_cObject, "const_set");
+  rb_obj_ivar_set = get_method(rb_cObject, "instance_variable_set");
   tLAST_TOKEN = rb_intern("core#set_postexe") + 10;
 }
