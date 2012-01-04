@@ -11,6 +11,7 @@ static VALUE (*enc_replicate)(VALUE, VALUE);
 static VALUE (*enc_list)(VALUE);
 static VALUE (*enc_find)(VALUE, VALUE);
 static VALUE (*rb_obj_encoding)(VALUE obj);
+static VALUE (*rb_str_force_encoding)(VALUE, VALUE);
 
 VALUE rb_str_cat(VALUE str, const char *ptr, long len) {
   buf_string.as.heap.ptr = (char*)ptr;
@@ -170,6 +171,14 @@ int rb_define_dummy_encoding(const char *name) {
   return RARRAY_LEN(list) - 1;
 }
 
+VALUE rb_enc_str_new(const char *ptr, long len, rb_encoding *encoding) {
+  VALUE str, enc, list = enc_list(rb_cEncoding);
+  enc = RARRAY_PTR(list)[encoding->ruby_encoding_index];
+  str = rb_str_new(ptr, len);
+  rb_str_force_encoding(str, enc);
+  return str;
+}
+
 void Init_StringCore() {
   buf_string.basic.klass = rb_cString;
   rb_str_intern = get_instance_method(rb_cString, "intern");
@@ -187,4 +196,5 @@ void Init_String() {
   enc_list = get_method(rb_cEncoding, "list");
   enc_find = get_method(rb_cEncoding, "find");
   rb_obj_encoding = get_instance_method(rb_cString, "encoding");
+  rb_str_force_encoding = get_instance_method(rb_cString, "force_encoding");
 }

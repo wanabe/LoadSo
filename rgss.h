@@ -375,7 +375,14 @@ struct METHOD {
     rb_method_entry_t me;
 };
 #define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
-typedef void rb_encoding; /* TODO */
+typedef struct OnigEncodingTypeST {
+  void *reserved1;     /* TODO */
+  const char *name;
+  int max_enc_len;
+  int min_enc_len;
+  void *reserved2[12]; /* TODO */
+  int ruby_encoding_index;
+} OnigEncodingType, rb_encoding;
 
 typedef void rb_vm_t; /* TODO */
 typedef struct {
