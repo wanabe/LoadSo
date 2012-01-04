@@ -5,6 +5,7 @@ static VALUE (*rb_str_intern)(VALUE);
 static VALUE (*rb_str_plus)(VALUE, VALUE);
 static VALUE (*rb_str_concat)(VALUE, VALUE);
 static VALUE (*rb_str_cmp_m)(VALUE, VALUE);
+static VALUE (*rb_f_string)(VALUE, VALUE);
 static VALUE (*rb_sym_to_s)(VALUE);
 static VALUE (*get_default_internal)(VALUE);
 static VALUE (*get_default_external)(VALUE);
@@ -88,6 +89,10 @@ char *rb_string_value_cstr(volatile VALUE *ptr) {
 
 int rb_str_cmp(VALUE str1, VALUE str2) {
   return FIX2LONG(rb_str_cmp_m(str1, str2));
+}
+
+VALUE rb_String(VALUE val) {
+  return rb_f_string(rb_cString, val);
 }
 
 ID rb_intern2(const char *name, long len) {
@@ -197,6 +202,7 @@ void Init_String() {
   rb_str_plus = get_instance_method(rb_cString, "+");
   rb_str_concat = get_instance_method(rb_cString, "concat");
   rb_str_cmp_m = get_instance_method(rb_cString, "<=>");
+  rb_f_string = get_global_func("String");
 
   rb_sym_to_s = get_instance_method(rb_cSymbol, "to_s");
 
