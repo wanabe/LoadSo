@@ -2,6 +2,7 @@
 
 static VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 static VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
+static VALUE (*rb_ary_clear_)(VALUE);
 
 VALUE rb_ary_new() {
   return rb_class_new_instance(0, NULL, rb_cArray);
@@ -53,7 +54,12 @@ VALUE rb_ary_join(VALUE ary, VALUE sep) {
   return rb_ary_join_m(1, &sep, ary);
 }
 
+VALUE rb_ary_clear(VALUE ary) {
+  return rb_ary_clear_(ary);
+}
+
 void Init_Array() {
   rb_ary_push_m = get_instance_method(rb_cArray, "push");
   rb_ary_join_m = get_instance_method(rb_cArray, "join");
+  rb_ary_clear_ = get_instance_method(rb_cArray, "clear");
 }
