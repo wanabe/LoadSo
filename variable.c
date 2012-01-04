@@ -9,6 +9,7 @@ VALUE rb_mGC;
 static VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
 static VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
 static VALUE (*rb_obj_ivar_set)(VALUE, VALUE, VALUE);
+static VALUE (*rb_obj_ivar_get)(VALUE, VALUE);
 static ID tLAST_TOKEN;
 
 #define ID_SCOPE_MASK 0x07
@@ -60,7 +61,26 @@ VALUE rb_ivar_set(VALUE obj, ID id, VALUE val) {
     inner_table = rb_hash_new();
     rb_hash_aset(ivar_table, obj, inner_table);
   }
-  rb_hash_aset(inner_table, ID2SYM(id), val);
+  return rb_hash_aset(inner_table, ID2SYM(id), val);
+}
+
+VALUE rb_ivar_get(VALUE obj, ID id) {
+  VALUE ivar_table, inner_table;
+  if(is_instance_id(id)) {
+    return rb_obj_ivar_get(obj, ID2SYM(id));
+  }
+  switch (TYPE(obj)) {
+  case T_OBJECT:
+  case T_CLASS:
+  case T_MODULE:
+    rb_raise(rb_eNotImpError, "TODO: rb_ivar_get(obj_or_class_or_mod, :not_ivar_name, val) is not implemented yet.");
+  }
+  ivar_table = rb_eval_string("$__loadso__ivar_table");
+  inner_table = rb_hash_aref(ivar_table, obj);
+  if(!inner_table) {
+    return Qnil;
+  }
+  return rb_hash_aref(inner_table, ID2SYM(id));
 }
 
 void Init_VariableCore() {
@@ -102,5 +122,6 @@ void Init_Variable() {
   VALUE ivar_table = rb_eval_string("$__loadso__ivar_table = Hash.new(false)");
   rb_mod_const_set = get_method(rb_cObject, "const_set");
   rb_obj_ivar_set = get_method(rb_cObject, "instance_variable_set");
+  rb_obj_ivar_get = get_method(rb_cObject, "instance_variable_get");
   tLAST_TOKEN = rb_intern("core#set_postexe") + 10;
 }
