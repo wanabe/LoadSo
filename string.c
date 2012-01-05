@@ -1,12 +1,12 @@
 #include "load_so.h"
 #include <stdio.h>
 
-static VALUE (*rb_str_intern)(VALUE);
+static VALUE (*rb_str_intern_)(VALUE);
 static VALUE (*rb_str_plus)(VALUE, VALUE);
 static VALUE (*rb_str_concat_)(VALUE, VALUE);
 static VALUE (*rb_str_cmp_m)(VALUE, VALUE);
 static VALUE (*rb_f_string)(VALUE, VALUE);
-static VALUE (*rb_sym_to_s)(VALUE);
+static VALUE (*rb_sym_to_s_)(VALUE);
 static VALUE (*get_default_internal)(VALUE);
 static VALUE (*get_default_external)(VALUE);
 static VALUE (*enc_replicate)(VALUE, VALUE);
@@ -36,6 +36,16 @@ VALUE rb_str_new_cstr(const char *ptr) {
   VALUE str = rb_class_new_instance(0, NULL, rb_cString);
   str = rb_str_concat_(str, set_buf_string(ptr));
   return str;
+}
+
+int ruby_snprintf(char *str, size_t n, char const *fmt, ...) {
+  va_list ap;
+  int ret;
+
+  va_start(ap, fmt);
+  ret = vsnprintf(str, n, fmt, ap);
+  va_end(ap);
+  return ret;
 }
 
 int ruby_vsnprintf(char *str, size_t n, const char *fmt, va_list ap) {
@@ -109,12 +119,16 @@ VALUE rb_String(VALUE val) {
   return rb_f_string(rb_cString, val);
 }
 
+VALUE rb_str_intern(VALUE str) {
+  return rb_str_intern_(str);
+}
+
 ID rb_intern2(const char *name, long len) {
-  return SYM2ID(rb_str_intern(set_buf_string2(name, len)));
+  return SYM2ID(rb_str_intern_(set_buf_string2(name, len)));
 }
 
 ID rb_intern(const char *name) {
-  return SYM2ID(rb_str_intern(set_buf_string(name)));
+  return SYM2ID(rb_str_intern_(set_buf_string(name)));
 }
 
 ID rb_to_id(VALUE name) {
@@ -122,7 +136,7 @@ ID rb_to_id(VALUE name) {
   default:
     rb_raise(rb_eNotImpError, "TODO: rb_to_id(not_str_or_sym) is not implemented yet.");
   case T_STRING:
-    name = rb_str_intern(name);
+    name = rb_str_intern_(name);
     /* fall through */
   case T_SYMBOL:
     return SYM2ID(name);
@@ -130,8 +144,12 @@ ID rb_to_id(VALUE name) {
   return Qnil; /* not reached */
 }
 
+VALUE rb_sym_to_s(VALUE sym) {
+  return rb_sym_to_s(sym);
+}
+
 VALUE rb_id2str(ID id) {
-  return rb_sym_to_s(ID2SYM(id));
+  return rb_sym_to_s_(ID2SYM(id));
 }
 
 const char *rb_id2name(ID id) {
@@ -209,7 +227,7 @@ VALUE rb_enc_str_new(const char *ptr, long len, rb_encoding *encoding) {
 
 void Init_StringCore() {
   buf_string.basic.klass = rb_cString;
-  rb_str_intern = get_instance_method(rb_cString, "intern");
+  rb_str_intern_ = get_instance_method(rb_cString, "intern");
 }
 
 void Init_String() {
@@ -218,7 +236,7 @@ void Init_String() {
   rb_str_cmp_m = get_instance_method(rb_cString, "<=>");
   rb_f_string = get_global_func("String");
 
-  rb_sym_to_s = get_instance_method(rb_cSymbol, "to_s");
+  rb_sym_to_s_ = get_instance_method(rb_cSymbol, "to_s");
 
   get_default_internal = get_method(rb_cEncoding, "default_internal");
   get_default_external = get_method(rb_cEncoding, "default_external");
