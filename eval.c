@@ -101,6 +101,53 @@ VALUE rb_call_super(int argc, const VALUE *argv) {
   return rb_method_call(argc, argv, method);
 }
 
+VALUE rb_apply(VALUE recv, ID mid, VALUE args) {
+  rb_raise(rb_eNotImpError, "TODO: rb_apply is not implemented yet.");
+  return Qnil;
+}
+
+void rb_backtrace() {
+  rb_raise(rb_eNotImpError, "TODO: rb_backtrace is not implemented yet.");
+}
+
+VALUE rb_block_call(VALUE obj, ID mid, int argc, VALUE * argv, VALUE (*bl_proc) (ANYARGS), VALUE data2) {
+  rb_raise(rb_eNotImpError, "TODO: rb_block_call is not implemented yet.");
+  return Qnil;
+}
+
+VALUE rb_errinfo() {
+  rb_raise(rb_eNotImpError, "TODO: rb_errinfo is not implemented yet.");
+  return Qnil;
+}
+
+ID rb_frame_this_func(void) {
+  rb_raise(rb_eNotImpError, "TODO: rb_errinfo is not implemented yet.");
+  return 0;
+}
+
+VALUE rb_funcall2(VALUE recv, ID mid, int argc, const VALUE *argv) {
+  rb_raise(rb_eNotImpError, "TODO: rb_errinfo is not implemented yet.");
+  return Qnil;
+}
+
+VALUE rb_ensure(VALUE (*b_proc)(ANYARGS), VALUE data1, VALUE (*e_proc)(ANYARGS), VALUE data2) {
+  rb_raise(rb_eNotImpError, "TODO: rb_ensure is not implemented yet.");
+  return Qnil;
+}
+
+VALUE rb_protect(VALUE (* proc) (VALUE), VALUE data, int * state) {
+  rb_raise(rb_eNotImpError, "TODO: rb_protect is not implemented yet.");
+  return Qnil;
+}
+
+void rb_write_error(const char *mesg) {
+  rb_raise(rb_eNotImpError, "TODO: rb_write_error is not implemented yet.");
+}
+
+void ruby_finalize(void) {
+  rb_raise(rb_eNotImpError, "TODO: ruby_finalize is not implemented yet.");
+}
+
 void Init_Eval() {
   rb_f_eval = get_global_func("eval");
   rb_f_raise = get_global_func("raise");

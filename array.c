@@ -68,6 +68,15 @@ VALUE rb_ary_unshift(VALUE ary, VALUE item) {
   return rb_ary_unshift_m(1, &item, ary);
 }
 
+VALUE rb_ary_delete_at(VALUE ary, long pos) {
+  rb_raise(rb_eNotImpError, "TODO: rb_ary_delete_at is not implemented yet.");
+  return Qnil;
+}
+
+void rb_ary_store(VALUE ary, long idx, VALUE val) {
+  rb_raise(rb_eNotImpError, "TODO: rb_ary_store is not implemented yet.");
+}
+
 void Init_Array() {
   rb_ary_push_m = get_instance_method(rb_cArray, "push");
   rb_ary_join_m = get_instance_method(rb_cArray, "join");

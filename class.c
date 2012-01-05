@@ -280,6 +280,11 @@ VALUE rb_obj_is_kind_of(VALUE obj, VALUE c) {
   return ret;
 }
 
+int rb_respond_to(VALUE obj, ID id) {
+  rb_raise(rb_eNotImpError, "TODO: rb_respond_to is not implemented yet.");
+  return 0;
+}
+
 void Init_ClassCore(VALUE vmethod) {
   struct METHOD *method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
 

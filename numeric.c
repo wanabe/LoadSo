@@ -52,6 +52,41 @@ SIGNED_VALUE rb_num2long(VALUE val) {
   return 0;
 }
 
+double rb_big2dbl(VALUE x) {
+  rb_raise(rb_eNotImpError, "TODO: rb_big2dbl is not implemented yet.");
+  return 0;
+}
+
+VALUE rb_fix2str(VALUE x, int base) {
+  rb_raise(rb_eNotImpError, "TODO: rb_fix2str is not implemented yet.");
+  return 0;
+}
+#define LONG_LONG long long
+LONG_LONG rb_num2ll(VALUE val) {
+  rb_raise(rb_eNotImpError, "TODO: rb_num2ll is not implemented yet.");
+  return 0;
+}
+
+unsigned LONG_LONG rb_num2ull(VALUE val) {
+  rb_raise(rb_eNotImpError, "TODO: rb_num2ull is not implemented yet.");
+  return 0;
+}
+
+VALUE rb_num2ulong(VALUE val) {
+  rb_raise(rb_eNotImpError, "TODO: rb_num2ulong is not implemented yet.");
+  return 0;
+}
+
+VALUE rb_ull2inum(unsigned LONG_LONG n) {
+  rb_raise(rb_eNotImpError, "TODO: rb_ull2inum is not implemented yet.");
+  return 0;
+}
+
+VALUE rb_ll2inum(LONG_LONG n) {
+  rb_raise(rb_eNotImpError, "TODO: rb_ll2inum is not implemented yet.");
+  return 0;
+}
+
 void Init_Numeric() {
   rb_f_float = get_global_func("Float");
   rb_fix_lshift = get_instance_method(rb_cFixnum, "<<");

@@ -81,6 +81,11 @@ void rb_mark_hash(st_table *tbl) {
   st_foreach(tbl, mark_keyvalue, 0);
 }
 
+int rb_during_gc(void) {
+  rb_raise(rb_eNotImpError, "TODO: rb_during_gc is not implemented yet.");
+  return 1;
+}
+
 void Init_ObjSpace() {
   rb_eval_string("$__loadso__global_list = []");
   rb_gc_start = get_method(rb_mGC, "start");

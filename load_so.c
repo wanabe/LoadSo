@@ -31,6 +31,11 @@ static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
   return Qnil;
 }
 
+VALUE rb_enumeratorize(VALUE obj, VALUE meth, int argc, VALUE *argv) {
+  rb_raise(rb_eNotImpError, "TODO: rb_enumeratorize is not implemented yet.");
+  return 0;
+}
+
 void Init_ClassCore(VALUE);
 void Init_VariableCore();
 void Init_StringCore();
