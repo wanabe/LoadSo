@@ -1,7 +1,7 @@
 #include "load_so.h"
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
-VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError;
+VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError, rb_eIndexError;
 VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;
 VALUE rb_cMethod, rb_cUnboundMethod;
 VALUE rb_mGC;
@@ -116,6 +116,7 @@ void Init_VariableCore() {
   rb_eNotImpError = const_get_cstr(rb_cObject, "NotImplementedError");
   rb_eSecurityError = const_get_cstr(rb_cObject, "SecurityError");
   rb_eNoMethodError = const_get_cstr(rb_cObject, "NoMethodError");
+  rb_eIndexError = const_get_cstr(rb_cObject, "IndexError");
 }
 
 void Init_Variable() {
