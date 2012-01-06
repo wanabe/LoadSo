@@ -384,7 +384,19 @@ typedef struct OnigEncodingTypeST {
   int ruby_encoding_index;
 } OnigEncodingType, rb_encoding;
 
+enum rb_thread_status {
+    THREAD_TO_KILL,
+    THREAD_RUNNABLE,
+    THREAD_STOPPED,
+    THREAD_STOPPED_FOREVER,
+    THREAD_KILLED
+};
 typedef void rb_vm_t; /* TODO */
+typedef HANDLE rb_thread_id_t;
+typedef struct native_thread_data_struct {
+    HANDLE interrupt_event;
+} native_thread_data_t;
+typedef void rb_block_t; /* TODO */
 typedef struct {
     VALUE *pc;			/* cfp[0] */
     VALUE *sp;			/* cfp[1] */
@@ -407,8 +419,48 @@ typedef struct rb_thread_struct {
     unsigned long stack_size;
     rb_control_frame_t *cfp;
     int safe_level;
+    int raised_flag;
+    VALUE last_status; /* $? */
+
+    /* passing state */
+    int state;
+
+    int waiting_fd;
+
+    /* for rb_iterate */
+    const rb_block_t *passed_block;
+
+    /* for bmethod */
+    const rb_method_entry_t *passed_me;
+
+    /* for load(true) */
+    VALUE top_self;
+    VALUE top_wrapper;
+
+    /* eval env */
+    rb_block_t *base_block;
+
+    VALUE *local_lfp;
+    VALUE local_svar;
+
+    /* thread control */
+    rb_thread_id_t thread_id;
+    enum rb_thread_status status;
+    int priority;
+
+    native_thread_data_t native_thread_data;
+    void *blocking_region_buffer;
+
+    VALUE thgroup;
+    VALUE value;
+
+    VALUE errinfo;
+    VALUE thrown_errinfo;
+
   /* TODO: rb_thread_t has more members */
 } rb_thread_t;
+
+#define GC_GUARDED_PTR_REF(p) ((void *)(((VALUE)(p)) & ~0x03))
 
 VALUE rb_newobj();
 void rb_raise(VALUE, const char*,...);

@@ -58,7 +58,15 @@ VALUE rb_block_proc() {
 }
 
 int rb_block_given_p() {
-  return RTEST(rb_f_block_given_p());
+    rb_thread_t *th = GET_THREAD();
+
+    if ((th->cfp->lfp[0] & 0x02) == 0 &&
+	GC_GUARDED_PTR_REF(th->cfp->lfp[0])) {
+	return TRUE;
+    }
+    else {
+	return FALSE;
+    }
 }
 
 VALUE rb_funcall(VALUE recv, ID mid, int n, ...) {
