@@ -128,13 +128,19 @@ VALUE rb_errinfo() {
   return Qnil;
 }
 
-ID rb_frame_this_func(void) {
-  rb_raise(rb_eNotImpError, "TODO: rb_errinfo is not implemented yet.");
+static ID frame_func_id(rb_control_frame_t *cfp) {
+  if (cfp->me) {
+    return cfp->me->def->original_id;
+  }
+  rb_raise(rb_eNotImpError, "TODO: frame_func_id is under construction.");
   return 0;
+}
+ID rb_frame_this_func(void) {
+  return frame_func_id(GET_THREAD()->cfp);
 }
 
 VALUE rb_funcall2(VALUE recv, ID mid, int argc, const VALUE *argv) {
-  rb_raise(rb_eNotImpError, "TODO: rb_errinfo is not implemented yet.");
+  rb_raise(rb_eNotImpError, "TODO: rb_funcall2 is not implemented yet.");
   return Qnil;
 }
 
