@@ -1,4 +1,5 @@
 #include "load_so.h"
+#include <stdio.h>
 
 struct RString buf_string = {{RSTRING_NOEMBED | T_STRING, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
@@ -50,6 +51,10 @@ void Init_Hash();
 void Init_Thread();
 
 void Init_LoadSo(VALUE vmethod, VALUE cObject) {
+#ifdef CREATE_CONSOLE
+  AllocConsole();
+  freopen("CON", "w", stdout);
+#endif
   LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
   rb_cObject = cObject;
 
