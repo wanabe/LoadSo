@@ -1,7 +1,7 @@
 /*
   This file is made up of the part of Matz' Ruby Implementation.
   http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/branches/ruby_1_9_2/
-*/
+ */
 
 #include <stdarg.h>
 
@@ -18,15 +18,15 @@ typedef unsigned long ID;
 #define SIGNED_VALUE long
 
 enum ruby_special_consts {
-    RUBY_Qfalse = 0,
-    RUBY_Qtrue  = 2,
-    RUBY_Qnil   = 4,
-    RUBY_Qundef = 6,
+  RUBY_Qfalse = 0,
+  RUBY_Qtrue  = 2,
+  RUBY_Qnil   = 4,
+  RUBY_Qundef = 6,
 
-    RUBY_IMMEDIATE_MASK = 0x03,
-    RUBY_FIXNUM_FLAG    = 0x01,
-    RUBY_SYMBOL_FLAG    = 0x0e,
-    RUBY_SPECIAL_SHIFT  = 8
+  RUBY_IMMEDIATE_MASK = 0x03,
+  RUBY_FIXNUM_FLAG    = 0x01,
+  RUBY_SYMBOL_FLAG    = 0x0e,
+  RUBY_SPECIAL_SHIFT  = 8
 };
 #define Qfalse ((VALUE)RUBY_Qfalse)
 #define Qtrue  ((VALUE)RUBY_Qtrue)
@@ -73,36 +73,36 @@ enum ruby_special_consts {
 #define FL_USER19    (((VALUE)1)<<(FL_USHIFT+19))
 
 enum ruby_value_type {
-    RUBY_T_NONE   = 0x00,
+  RUBY_T_NONE   = 0x00,
 
-    RUBY_T_OBJECT = 0x01,
-    RUBY_T_CLASS  = 0x02,
-    RUBY_T_MODULE = 0x03,
-    RUBY_T_FLOAT  = 0x04,
-    RUBY_T_STRING = 0x05,
-    RUBY_T_REGEXP = 0x06,
-    RUBY_T_ARRAY  = 0x07,
-    RUBY_T_HASH   = 0x08,
-    RUBY_T_STRUCT = 0x09,
-    RUBY_T_BIGNUM = 0x0a,
-    RUBY_T_FILE   = 0x0b,
-    RUBY_T_DATA   = 0x0c,
-    RUBY_T_MATCH  = 0x0d,
-    RUBY_T_COMPLEX  = 0x0e,
-    RUBY_T_RATIONAL = 0x0f,
+  RUBY_T_OBJECT = 0x01,
+  RUBY_T_CLASS  = 0x02,
+  RUBY_T_MODULE = 0x03,
+  RUBY_T_FLOAT  = 0x04,
+  RUBY_T_STRING = 0x05,
+  RUBY_T_REGEXP = 0x06,
+  RUBY_T_ARRAY  = 0x07,
+  RUBY_T_HASH   = 0x08,
+  RUBY_T_STRUCT = 0x09,
+  RUBY_T_BIGNUM = 0x0a,
+  RUBY_T_FILE   = 0x0b,
+  RUBY_T_DATA   = 0x0c,
+  RUBY_T_MATCH  = 0x0d,
+  RUBY_T_COMPLEX  = 0x0e,
+  RUBY_T_RATIONAL = 0x0f,
 
-    RUBY_T_NIL    = 0x11,
-    RUBY_T_TRUE   = 0x12,
-    RUBY_T_FALSE  = 0x13,
-    RUBY_T_SYMBOL = 0x14,
-    RUBY_T_FIXNUM = 0x15,
+  RUBY_T_NIL    = 0x11,
+  RUBY_T_TRUE   = 0x12,
+  RUBY_T_FALSE  = 0x13,
+  RUBY_T_SYMBOL = 0x14,
+  RUBY_T_FIXNUM = 0x15,
 
-    RUBY_T_UNDEF  = 0x1b,
-    RUBY_T_NODE   = 0x1c,
-    RUBY_T_ICLASS = 0x1d,
-    RUBY_T_ZOMBIE = 0x1e,
+  RUBY_T_UNDEF  = 0x1b,
+  RUBY_T_NODE   = 0x1c,
+  RUBY_T_ICLASS = 0x1d,
+  RUBY_T_ZOMBIE = 0x1e,
 
-    RUBY_T_MASK   = 0x1f
+  RUBY_T_MASK   = 0x1f
 };
 
 #define T_NONE   RUBY_T_NONE
@@ -146,21 +146,21 @@ enum ruby_value_type {
 #define FIX2LONG(x) (long)RSHIFT((SIGNED_VALUE)(x),1)
 
 struct RBasic {
-    VALUE flags;
-    VALUE klass;
+  VALUE flags;
+  VALUE klass;
 };
 
 struct rb_classext_struct {
-    VALUE super;
-    struct st_table *iv_tbl;
-    struct st_table *const_tbl;
+  VALUE super;
+  struct st_table *iv_tbl;
+  struct st_table *const_tbl;
 };
 typedef struct rb_classext_struct rb_classext_t;
 struct RClass {
-    struct RBasic basic;
-    rb_classext_t *ptr;
-    struct st_table *m_tbl;
-    struct st_table *iv_index_tbl;
+  struct RBasic basic;
+  rb_classext_t *ptr;
+  struct st_table *m_tbl;
+  struct st_table *iv_index_tbl;
 };
 #define RCLASS_EXT(c) (RCLASS(c)->ptr)
 #define RCLASS_SUPER(c) (RCLASS_EXT(c)->super)
@@ -168,102 +168,102 @@ struct RClass {
 
 #define RSTRING_EMBED_LEN_MAX ((int)((sizeof(VALUE)*3)/sizeof(char)-1))
 struct RString {
-    struct RBasic basic;
-    union {
-	struct {
-	    long len;
-	    char *ptr;
-	    union {
-		long capa;
-		VALUE shared;
-	    } aux;
-	} heap;
-	char ary[RSTRING_EMBED_LEN_MAX + 1];
-    } as;
+  struct RBasic basic;
+  union {
+    struct {
+      long len;
+      char *ptr;
+      union {
+        long capa;
+        VALUE shared;
+      } aux;
+    } heap;
+    char ary[RSTRING_EMBED_LEN_MAX + 1];
+  } as;
 };
 #define RSTRING_NOEMBED FL_USER1
 #define RSTRING_EMBED_LEN_MASK (FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6)
 #define RSTRING_EMBED_LEN_SHIFT (FL_USHIFT+2)
 #define RSTRING_EMBED_LEN(str) \
-     (long)((RBASIC(str)->flags >> RSTRING_EMBED_LEN_SHIFT) & \
-            (RSTRING_EMBED_LEN_MASK >> RSTRING_EMBED_LEN_SHIFT))
+  (long)((RBASIC(str)->flags >> RSTRING_EMBED_LEN_SHIFT) & \
+         (RSTRING_EMBED_LEN_MASK >> RSTRING_EMBED_LEN_SHIFT))
 #define RSTRING_LEN(str) \
-    (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
-     RSTRING_EMBED_LEN(str) : \
-     RSTRING(str)->as.heap.len)
+  (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
+   RSTRING_EMBED_LEN(str) : \
+   RSTRING(str)->as.heap.len)
 #define RSTRING_PTR(str) \
-    (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
-     RSTRING(str)->as.ary : \
-     RSTRING(str)->as.heap.ptr)
+  (!(RBASIC(str)->flags & RSTRING_NOEMBED) ? \
+   RSTRING(str)->as.ary : \
+   RSTRING(str)->as.heap.ptr)
 
 #define RARRAY_EMBED_LEN_MAX 3
 struct RArray {
-    struct RBasic basic;
-    union {
-	struct {
-	    long len;
-	    union {
-		long capa;
-		VALUE shared;
-	    } aux;
-	    VALUE *ptr;
-	} heap;
-	VALUE ary[RARRAY_EMBED_LEN_MAX];
-    } as;
+  struct RBasic basic;
+  union {
+    struct {
+      long len;
+      union {
+        long capa;
+        VALUE shared;
+      } aux;
+      VALUE *ptr;
+    } heap;
+    VALUE ary[RARRAY_EMBED_LEN_MAX];
+  } as;
 };
 #define RARRAY_EMBED_FLAG FL_USER1
 #define RARRAY_EMBED_LEN_MASK (FL_USER4|FL_USER3)
 #define RARRAY_EMBED_LEN_SHIFT (FL_USHIFT+3)
 #define RARRAY_LEN(a) \
-    ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
-     (long)((RBASIC(a)->flags >> RARRAY_EMBED_LEN_SHIFT) & \
-	 (RARRAY_EMBED_LEN_MASK >> RARRAY_EMBED_LEN_SHIFT)) : \
-     RARRAY(a)->as.heap.len)
+  ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
+   (long)((RBASIC(a)->flags >> RARRAY_EMBED_LEN_SHIFT) & \
+          (RARRAY_EMBED_LEN_MASK >> RARRAY_EMBED_LEN_SHIFT)) : \
+   RARRAY(a)->as.heap.len)
 #define RARRAY_PTR(a) \
-    ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
-     RARRAY(a)->as.ary : \
-     RARRAY(a)->as.heap.ptr)
+  ((RBASIC(a)->flags & RARRAY_EMBED_FLAG) ? \
+   RARRAY(a)->as.ary : \
+   RARRAY(a)->as.heap.ptr)
 
 struct RFloat {
-    struct RBasic basic;
-    double float_value;
+  struct RBasic basic;
+  double float_value;
 };
 #define RFLOAT_VALUE(v) (RFLOAT(v)->float_value)
 #define DBL2NUM(dbl)  rb_float_new(dbl)
 
 struct RHash {
-    struct RBasic basic;
-    struct st_table *ntbl;      /* possibly 0 */
-    int iter_lev;
-    VALUE ifnone;
+  struct RBasic basic;
+  struct st_table *ntbl;      /* possibly 0 */
+  int iter_lev;
+  VALUE ifnone;
 };
 
 struct RData {
-    struct RBasic basic;
-    void (*dmark)(void*);
-    void (*dfree)(void*);
-    void *data;
+  struct RBasic basic;
+  void (*dmark)(void*);
+  void (*dfree)(void*);
+  void *data;
 };
 #define DATA_PTR(dta) (RDATA(dta)->data)
 typedef struct rb_data_type_struct rb_data_type_t;
 struct rb_data_type_struct {
-    const char *wrap_struct_name;
-    struct {
-	void (*dmark)(void*);
-	void (*dfree)(void*);
-	size_t (*dsize)(const void *);
-	void *reserved[2]; /* For future extension.
+  const char *wrap_struct_name;
+  struct {
+    void (*dmark)(void*);
+    void (*dfree)(void*);
+    size_t (*dsize)(const void *);
+    void *reserved[2]; /* For future extension.
 			      This array *must* be filled with ZERO. */
-    } function;
-    const rb_data_type_t *parent;
-    void *data;        /* This area can be used for any purpose
+  } function;
+  const rb_data_type_t *parent;
+  void *data;        /* This area can be used for any purpose
                           by a programmer who define the type. */
 };
 struct RTypedData {
-    struct RBasic basic;
-    const rb_data_type_t *type;
-    VALUE typed_flag; /* 1 or not */
-    void *data;
+  struct RBasic basic;
+  const rb_data_type_t *type;
+  VALUE typed_flag; /* 1 or not */
+  void *data;
 };
 #define RTYPEDDATA_P(v)    (RTYPEDDATA(v)->typed_flag == 1)
 #define RTYPEDDATA_TYPE(v) (RTYPEDDATA(v)->type)
@@ -308,71 +308,71 @@ static inline int rb_type(VALUE obj) {
 
 #define NEWOBJ(obj,type) type *(obj) = (type*)rb_newobj()
 #define OBJSETUP(obj,c,t) do {\
-    RBASIC(obj)->flags = (t);\
-    RBASIC(obj)->klass = (c);\
+  RBASIC(obj)->flags = (t);\
+  RBASIC(obj)->klass = (c);\
 } while (0)
 
 typedef enum {
-    NOEX_PUBLIC    = 0x00,
-    NOEX_NOSUPER   = 0x01,
-    NOEX_PRIVATE   = 0x02,
-    NOEX_PROTECTED = 0x04,
-    NOEX_MASK      = 0x06,
-    NOEX_BASIC     = 0x08,
-    NOEX_UNDEF     = NOEX_NOSUPER,
-    NOEX_MODFUNC   = 0x12,
-    NOEX_SUPER     = 0x20,
-    NOEX_VCALL     = 0x40,
-    NOEX_RESPONDS  = 0x80
+  NOEX_PUBLIC    = 0x00,
+  NOEX_NOSUPER   = 0x01,
+  NOEX_PRIVATE   = 0x02,
+  NOEX_PROTECTED = 0x04,
+  NOEX_MASK      = 0x06,
+  NOEX_BASIC     = 0x08,
+  NOEX_UNDEF     = NOEX_NOSUPER,
+  NOEX_MODFUNC   = 0x12,
+  NOEX_SUPER     = 0x20,
+  NOEX_VCALL     = 0x40,
+  NOEX_RESPONDS  = 0x80
 } rb_method_flag_t;
 typedef enum {
-    VM_METHOD_TYPE_ISEQ,
-    VM_METHOD_TYPE_CFUNC,
-    VM_METHOD_TYPE_ATTRSET,
-    VM_METHOD_TYPE_IVAR,
-    VM_METHOD_TYPE_BMETHOD,
-    VM_METHOD_TYPE_ZSUPER,
-    VM_METHOD_TYPE_UNDEF,
-    VM_METHOD_TYPE_NOTIMPLEMENTED,
-    VM_METHOD_TYPE_OPTIMIZED, /* Kernel#send, Proc#call, etc */
-    VM_METHOD_TYPE_MISSING   /* wrapper for method_missing(id) */
+  VM_METHOD_TYPE_ISEQ,
+  VM_METHOD_TYPE_CFUNC,
+  VM_METHOD_TYPE_ATTRSET,
+  VM_METHOD_TYPE_IVAR,
+  VM_METHOD_TYPE_BMETHOD,
+  VM_METHOD_TYPE_ZSUPER,
+  VM_METHOD_TYPE_UNDEF,
+  VM_METHOD_TYPE_NOTIMPLEMENTED,
+  VM_METHOD_TYPE_OPTIMIZED, /* Kernel#send, Proc#call, etc */
+  VM_METHOD_TYPE_MISSING   /* wrapper for method_missing(id) */
 } rb_method_type_t;
 typedef struct rb_method_cfunc_struct {
-    VALUE (*func)(ANYARGS);
-    int argc;
+  VALUE (*func)(ANYARGS);
+  int argc;
 } rb_method_cfunc_t;
 typedef struct rb_method_attr_struct {
-    ID id;
-    VALUE location;
+  ID id;
+  VALUE location;
 } rb_method_attr_t;
 typedef struct rb_iseq_struct rb_iseq_t;
 typedef struct rb_method_definition_struct {
-    rb_method_type_t type; /* method type */
-    ID original_id;
-    union {
-	rb_iseq_t *iseq;            /* should be mark */
-	rb_method_cfunc_t cfunc;
-	rb_method_attr_t attr;
-	VALUE proc;                 /* should be mark */
-	enum method_optimized_type {
-	    OPTIMIZED_METHOD_TYPE_SEND,
-	    OPTIMIZED_METHOD_TYPE_CALL
-	} optimize_type;
-    } body;
-    int alias_count;
+  rb_method_type_t type; /* method type */
+  ID original_id;
+  union {
+    rb_iseq_t *iseq;            /* should be mark */
+    rb_method_cfunc_t cfunc;
+    rb_method_attr_t attr;
+    VALUE proc;                 /* should be mark */
+    enum method_optimized_type {
+      OPTIMIZED_METHOD_TYPE_SEND,
+      OPTIMIZED_METHOD_TYPE_CALL
+    } optimize_type;
+  } body;
+  int alias_count;
 } rb_method_definition_t;
 typedef struct rb_method_entry_struct {
-    rb_method_flag_t flag;
-    char mark;
-    rb_method_definition_t *def;
-    ID called_id;
-    VALUE klass;                    /* should be mark */
+  rb_method_flag_t flag;
+  char mark;
+  rb_method_definition_t *def;
+  ID called_id;
+  VALUE klass;                    /* should be mark */
 } rb_method_entry_t;
 struct METHOD {
-    VALUE recv;
-    VALUE rclass;
-    ID id;
-    rb_method_entry_t me;
+  VALUE recv;
+  VALUE rclass;
+  ID id;
+  rb_method_entry_t me;
 };
 #define ISDIGIT(c) (c >= '0' && c <= '9') /*rb_isdigit((unsigned char)(c))*/
 typedef struct OnigEncodingTypeST {
@@ -385,77 +385,77 @@ typedef struct OnigEncodingTypeST {
 } OnigEncodingType, rb_encoding;
 
 enum rb_thread_status {
-    THREAD_TO_KILL,
-    THREAD_RUNNABLE,
-    THREAD_STOPPED,
-    THREAD_STOPPED_FOREVER,
-    THREAD_KILLED
+  THREAD_TO_KILL,
+  THREAD_RUNNABLE,
+  THREAD_STOPPED,
+  THREAD_STOPPED_FOREVER,
+  THREAD_KILLED
 };
 typedef void rb_vm_t; /* TODO */
 typedef HANDLE rb_thread_id_t;
 typedef struct native_thread_data_struct {
-    HANDLE interrupt_event;
+  HANDLE interrupt_event;
 } native_thread_data_t;
 typedef void rb_block_t; /* TODO */
 typedef struct {
-    VALUE *pc;			/* cfp[0] */
-    VALUE *sp;			/* cfp[1] */
-    VALUE *bp;			/* cfp[2] */
-    rb_iseq_t *iseq;		/* cfp[3] */
-    VALUE flag;			/* cfp[4] */
-    VALUE self;			/* cfp[5] / block[0] */
-    VALUE *lfp;			/* cfp[6] / block[1] */
-    VALUE *dfp;			/* cfp[7] / block[2] */
-    rb_iseq_t *block_iseq;	/* cfp[8] / block[3] */
-    VALUE proc;			/* cfp[9] / block[4] */
-    const rb_method_entry_t *me;/* cfp[10] */
+  VALUE *pc;			/* cfp[0] */
+  VALUE *sp;			/* cfp[1] */
+  VALUE *bp;			/* cfp[2] */
+  rb_iseq_t *iseq;		/* cfp[3] */
+  VALUE flag;			/* cfp[4] */
+  VALUE self;			/* cfp[5] / block[0] */
+  VALUE *lfp;			/* cfp[6] / block[1] */
+  VALUE *dfp;			/* cfp[7] / block[2] */
+  rb_iseq_t *block_iseq;	/* cfp[8] / block[3] */
+  VALUE proc;			/* cfp[9] / block[4] */
+  const rb_method_entry_t *me;/* cfp[10] */
 } rb_control_frame_t;
 typedef struct rb_thread_struct {
-    VALUE self;
-    rb_vm_t *vm;
+  VALUE self;
+  rb_vm_t *vm;
 
-    /* execution information */
-    VALUE *stack;		/* must free, must mark */
-    unsigned long stack_size;
-    rb_control_frame_t *cfp;
-    int safe_level;
-    int raised_flag;
-    VALUE last_status; /* $? */
+  /* execution information */
+  VALUE *stack;		/* must free, must mark */
+  unsigned long stack_size;
+  rb_control_frame_t *cfp;
+  int safe_level;
+  int raised_flag;
+  VALUE last_status; /* $? */
 
-    /* passing state */
-    int state;
+  /* passing state */
+  int state;
 
-    int waiting_fd;
+  int waiting_fd;
 
-    /* for rb_iterate */
-    const rb_block_t *passed_block;
+  /* for rb_iterate */
+  const rb_block_t *passed_block;
 
-    /* for bmethod */
-    const rb_method_entry_t *passed_me;
+  /* for bmethod */
+  const rb_method_entry_t *passed_me;
 
-    /* for load(true) */
-    VALUE top_self;
-    VALUE top_wrapper;
+  /* for load(true) */
+  VALUE top_self;
+  VALUE top_wrapper;
 
-    /* eval env */
-    rb_block_t *base_block;
+  /* eval env */
+  rb_block_t *base_block;
 
-    VALUE *local_lfp;
-    VALUE local_svar;
+  VALUE *local_lfp;
+  VALUE local_svar;
 
-    /* thread control */
-    rb_thread_id_t thread_id;
-    enum rb_thread_status status;
-    int priority;
+  /* thread control */
+  rb_thread_id_t thread_id;
+  enum rb_thread_status status;
+  int priority;
 
-    native_thread_data_t native_thread_data;
-    void *blocking_region_buffer;
+  native_thread_data_t native_thread_data;
+  void *blocking_region_buffer;
 
-    VALUE thgroup;
-    VALUE value;
+  VALUE thgroup;
+  VALUE value;
 
-    VALUE errinfo;
-    VALUE thrown_errinfo;
+  VALUE errinfo;
+  VALUE thrown_errinfo;
 
   /* TODO: rb_thread_t has more members */
 } rb_thread_t;
