@@ -537,10 +537,11 @@ VALUE rb_ary_push(VALUE, VALUE);
 VALUE rb_vsprintf(const char *format, va_list ap);
 
 extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
-extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError;
 extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;
 extern VALUE rb_cMethod, rb_cUnboundMethod;
 extern VALUE rb_mGC;
+extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError, rb_eIndexError;
+extern VALUE rb_eFatal;
 
 static inline VALUE rb_class_of(VALUE obj) {
   if (IMMEDIATE_P(obj)) {

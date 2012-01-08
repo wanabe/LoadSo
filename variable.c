@@ -1,10 +1,11 @@
 #include "load_so.h"
 
 VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
-VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError, rb_eIndexError;
 VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;
 VALUE rb_cMethod, rb_cUnboundMethod;
 VALUE rb_mGC;
+VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError, rb_eIndexError;
+VALUE rb_eFatal;
 
 static VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
 static VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
@@ -121,6 +122,7 @@ void Init_VariableCore() {
 
 void Init_Variable() {
   VALUE ivar_table = rb_eval_string("$__loadso__ivar_table = Hash.new(false)");
+  rb_eFatal = rb_eval_string("ObjectSpace.each_object(Class).find{|c|c.to_s=='fatal'}");
   rb_mod_const_set = get_method(rb_cObject, "const_set");
   rb_obj_ivar_set = get_method(rb_cObject, "instance_variable_set");
   rb_obj_ivar_get = get_method(rb_cObject, "instance_variable_get");
