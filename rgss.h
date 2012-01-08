@@ -12,6 +12,7 @@
 #endif
 #define RSHIFT(x,y) ((x)>>(int)(y))
 #define ALLOC(type) ((type*)malloc(sizeof(type)))
+#define ALLOC_N(type,n) ((type*)malloc((n) * sizeof(type)))
 
 typedef unsigned long VALUE;
 typedef unsigned long ID;
@@ -143,6 +144,8 @@ enum ruby_value_type {
 #define FL_TEST(x,f) (FL_ABLE(x)?(RBASIC(x)->flags&(f)):0)
 #define OBJ_TAINTED(x) (!!FL_TEST((x), FL_TAINT))
 
+#define FL_SET(x,f) do {if (FL_ABLE(x)) RBASIC(x)->flags |= (f);} while (0)
+#define FL_UNSET(x,f) do {if (FL_ABLE(x)) RBASIC(x)->flags &= ~(f);} while (0)
 #define FIX2LONG(x) (long)RSHIFT((SIGNED_VALUE)(x),1)
 
 struct RBasic {

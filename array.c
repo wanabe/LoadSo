@@ -1,5 +1,21 @@
 #include "load_so.h"
 
+#define FL_UNSET_EMBED(ary) FL_UNSET((ary), RARRAY_EMBED_FLAG|RARRAY_EMBED_LEN_MASK)
+#define ARY_SET_CAPA(ary, n) do { \
+    RARRAY(ary)->as.heap.aux.capa = (n); \
+} while (0)
+#define ARY_SET_PTR(ary, p) do { \
+    RARRAY(ary)->as.heap.ptr = (p); \
+} while (0)
+#define ARY_SET_EMBED_LEN(ary, n) do { \
+    long tmp_n = (n); \
+    RBASIC(ary)->flags &= ~RARRAY_EMBED_LEN_MASK; \
+    RBASIC(ary)->flags |= (tmp_n) << RARRAY_EMBED_LEN_SHIFT; \
+} while (0)
+#define ARY_SET_HEAP_LEN(ary, n) do { \
+    RARRAY(ary)->as.heap.len = (n); \
+} while (0)
+
 static VALUE (*rb_ary_push_m)(int, VALUE*, VALUE);
 static VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 static VALUE (*rb_ary_clear_)(VALUE);
@@ -11,12 +27,24 @@ VALUE rb_ary_new() {
   return rb_class_new_instance(0, NULL, rb_cArray);
 }
 
+static VALUE rb_ary_new_with_len(long len) {
+  VALUE ary = rb_ary_new();
+  if (len > RARRAY_EMBED_LEN_MAX) {
+    FL_UNSET_EMBED(ary);
+    ARY_SET_PTR(ary, ALLOC_N(VALUE, len));
+    ARY_SET_CAPA(ary, len);
+    ARY_SET_HEAP_LEN(ary, len);
+  } else {
+    ARY_SET_EMBED_LEN(ary, len);
+  }
+  return ary;
+}
+
 VALUE rb_ary_new3(long n, ...) {
   va_list ar;
-  VALUE ary = INT2FIX(n);
+  VALUE ary;
   long i;
-
-  ary = rb_class_new_instance(1, &ary, rb_cArray);
+  ary = rb_ary_new_with_len(n);
 
   va_start(ar, n);
   for (i=0; i<n; i++) {
@@ -28,9 +56,9 @@ VALUE rb_ary_new3(long n, ...) {
 }
 
 VALUE rb_ary_new4(long n, const VALUE *elts) {
-  VALUE ary = INT2FIX(n);
+  VALUE ary;
 
-  ary = rb_class_new_instance(1, &ary, rb_cArray);
+  ary = rb_ary_new_with_len(n);
   if (n > 0 && elts) {
     memcpy(RARRAY_PTR(ary), elts, sizeof(VALUE) * n);
   }
