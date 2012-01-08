@@ -131,9 +131,9 @@ VALUE rb_block_call(VALUE obj, ID mid, int argc, VALUE * argv, VALUE (*bl_proc) 
   return Qnil;
 }
 
-VALUE rb_errinfo() {
-  rb_raise(rb_eNotImpError, "TODO: rb_errinfo is not implemented yet.");
-  return Qnil;
+VALUE rb_errinfo(void) {
+  rb_thread_t *th = GET_THREAD();
+  return th->errinfo;
 }
 
 static ID frame_func_id(rb_control_frame_t *cfp) {
