@@ -410,12 +410,20 @@ typedef struct {
   VALUE proc;			/* cfp[9] / block[4] */
   const rb_method_entry_t *me;/* cfp[10] */
 } rb_control_frame_t;
+typedef void *rb_atomic_t; /* TODO */
+#include <windows.h>
+typedef CRITICAL_SECTION rb_thread_lock_t;
+typedef void rb_unblock_function_t; /* TODO */
+struct rb_unblock_callback {
+    rb_unblock_function_t *func;
+    void *arg;
+};
 typedef struct rb_thread_struct {
   VALUE self;
   rb_vm_t *vm;
 
   /* execution information */
-  VALUE *stack;		/* must free, must mark */
+  VALUE *stack; /* must free, must mark */
   unsigned long stack_size;
   rb_control_frame_t *cfp;
   int safe_level;
@@ -424,8 +432,6 @@ typedef struct rb_thread_struct {
 
   /* passing state */
   int state;
-
-  int waiting_fd;
 
   /* for rb_iterate */
   const rb_block_t *passed_block;
@@ -447,6 +453,7 @@ typedef struct rb_thread_struct {
   rb_thread_id_t thread_id;
   enum rb_thread_status status;
   int priority;
+  int slice;
 
   native_thread_data_t native_thread_data;
   void *blocking_region_buffer;
@@ -456,7 +463,17 @@ typedef struct rb_thread_struct {
 
   VALUE errinfo;
   VALUE thrown_errinfo;
+  int exec_signal;
 
+  int interrupt_flag;
+  rb_thread_lock_t interrupt_lock;
+  struct rb_unblock_callback unblock;
+  VALUE locking_mutex;
+  struct rb_mutex_struct *keeping_mutexes;
+  int transition_for_lock;
+
+  struct rb_vm_tag *tag;
+  struct rb_vm_protect_tag *protect_tag;
   /* TODO: rb_thread_t has more members */
 } rb_thread_t;
 
