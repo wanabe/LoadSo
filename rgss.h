@@ -388,6 +388,20 @@ typedef struct OnigEncodingTypeST {
   int ruby_encoding_index;
 } OnigEncodingType, rb_encoding;
 
+#define RUBY_EVENT_NONE      0x0000
+#define RUBY_EVENT_LINE      0x0001
+#define RUBY_EVENT_CLASS     0x0002
+#define RUBY_EVENT_END       0x0004
+#define RUBY_EVENT_CALL      0x0008
+#define RUBY_EVENT_RETURN    0x0010
+#define RUBY_EVENT_C_CALL    0x0020
+#define RUBY_EVENT_C_RETURN  0x0040
+#define RUBY_EVENT_RAISE     0x0080
+#define RUBY_EVENT_ALL       0xffff
+#define RUBY_EVENT_VM       0x10000
+#define RUBY_EVENT_SWITCH   0x20000
+#define RUBY_EVENT_COVERAGE 0x40000
+
 VALUE rb_newobj();
 void rb_raise(VALUE, const char*,...);
 VALUE rb_const_get(VALUE, ID);
@@ -406,7 +420,11 @@ void rb_define_global_function(const char*, VALUE (*)(ANYARGS), int);
 VALUE rb_funcall3(VALUE, ID, int, const VALUE*);
 void rb_gc_mark(VALUE);
 VALUE rb_ary_push(VALUE, VALUE);
-VALUE rb_vsprintf(const char *format, va_list ap);
+VALUE rb_vsprintf(const char*, va_list);
+VALUE rb_hash_aref(VALUE, VALUE);
+VALUE rb_hash_aset(VALUE, VALUE, VALUE);
+VALUE rb_funcall(VALUE, ID, int, ...);
+VALUE rb_hash_new();
 
 extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
 extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;

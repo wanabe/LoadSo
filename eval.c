@@ -146,14 +146,17 @@ void rb_backtrace() {
   fprintf(stderr, "TODO: rb_backtrace is not implemented yet.");
 }
 
-VALUE rb_block_call(VALUE obj, ID mid, int argc, VALUE * argv, VALUE (*bl_proc) (ANYARGS), VALUE data2) {
-  rb_raise(rb_eNotImpError, "TODO: rb_block_call is not implemented yet.");
-  return Qnil;
-}
+NODE *rb_node_newnode(enum node_type type, VALUE a0, VALUE a1, VALUE a2){
+  NODE *n = (NODE*)rb_newobj();
 
-VALUE rb_errinfo(void) {
-  rb_thread_t *th = GET_THREAD();
-  return th->errinfo;
+  n->flags |= T_NODE;
+  nd_set_type(n, type);
+
+  n->u1.value = a0;
+  n->u2.value = a1;
+  n->u3.value = a2;
+
+  return n;
 }
 
 static ID frame_func_id(rb_control_frame_t *cfp) {
@@ -165,6 +168,109 @@ static ID frame_func_id(rb_control_frame_t *cfp) {
 }
 ID rb_frame_this_func(void) {
   return frame_func_id(GET_THREAD()->cfp);
+}
+
+VALUE rb_iterate(VALUE (* it_proc) (VALUE), VALUE data1, VALUE (* bl_proc) (ANYARGS), VALUE data2) {
+  int state;
+  volatile VALUE retval = Qnil;
+  rb_thread_t *th = GET_THREAD();
+  rb_control_frame_t *volatile cfp = th->cfp;
+
+  NODE *node = NEW_IFUNC(bl_proc, data2);
+  node->nd_aid = rb_frame_this_func();
+  TH_PUSH_TAG(th);
+  state = TH_EXEC_TAG();
+  if (state == 0) {
+  iter_retry:
+    {
+      rb_block_t *blockptr;
+      if (bl_proc) {
+        blockptr = RUBY_VM_GET_BLOCK_PTR_IN_CFP(th->cfp);
+        blockptr->iseq = (void *)node;
+        blockptr->proc = 0;
+      } else {
+        blockptr = GC_GUARDED_PTR_REF(th->cfp->lfp[0]);
+      }
+      th->passed_block = blockptr;
+    }
+    retval = (*it_proc) (data1);
+  } else {
+    VALUE err = th->errinfo;
+    if (state == TAG_BREAK) {
+      VALUE *escape_dfp = GET_THROWOBJ_CATCH_POINT(err);
+      VALUE *cdfp = cfp->dfp;
+
+      if (cdfp == escape_dfp) {
+        state = 0;
+        th->state = 0;
+        th->errinfo = Qnil;
+
+        /* check skipped frame */
+        while (th->cfp != cfp) {
+          if (UNLIKELY(VM_FRAME_TYPE(th->cfp) == VM_FRAME_MAGIC_CFUNC)) {
+            /* TODO: event hook
+            const rb_method_entry_t *me = th->cfp->me;
+            EXEC_EVENT_HOOK(th, RUBY_EVENT_C_RETURN, th->cfp->self, me->called_id, me->klass);
+             */
+          }
+
+          th->cfp = RUBY_VM_PREVIOUS_CONTROL_FRAME(th->cfp);
+        }
+      } else{
+        /* SDR(); printf("%p, %p\n", cdfp, escape_dfp); */
+      }
+    } else if (state == TAG_RETRY) {
+      VALUE *escape_dfp = GET_THROWOBJ_CATCH_POINT(err);
+      VALUE *cdfp = cfp->dfp;
+
+      if (cdfp == escape_dfp) {
+        state = 0;
+        th->state = 0;
+        th->errinfo = Qnil;
+        th->cfp = cfp;
+        goto iter_retry;
+      }
+    }
+  }
+  TH_POP_TAG();
+  node->u1.id = 0; /* TODO: this line avoid GC's SEGV - but why? */
+
+  switch (state) {
+  case 0:
+    break;
+  default:
+    TH_JUMP_TAG(th, state);
+  }
+
+  return retval;
+}
+
+struct iter_method_arg {
+  VALUE obj;
+  ID mid;
+  int argc;
+  VALUE *argv;
+};
+
+static VALUE iterate_method(VALUE obj) {
+  const struct iter_method_arg * arg = (struct iter_method_arg *) obj;
+
+  return rb_funcall3(arg->obj, arg->mid, arg->argc, arg->argv);
+}
+
+VALUE rb_block_call(VALUE obj, ID mid, int argc, VALUE * argv, VALUE (*bl_proc) (ANYARGS), VALUE data2) {
+  struct iter_method_arg arg;
+
+  arg.obj = obj;
+  arg.mid = mid;
+  arg.argc = argc;
+  arg.argv = argv;
+  return rb_iterate(iterate_method, (VALUE)&arg, bl_proc, data2);
+}
+
+VALUE rb_errinfo(void) {
+  rb_thread_t *th = GET_THREAD();
+  return th->errinfo;
 }
 
 VALUE rb_ensure(VALUE (*b_proc)(ANYARGS), VALUE data1, VALUE (*e_proc)(ANYARGS), VALUE data2) {
