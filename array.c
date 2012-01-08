@@ -28,15 +28,10 @@ VALUE rb_ary_new() {
 }
 
 VALUE rb_ary_new_with_len(long len) {
-  VALUE ary = rb_ary_new();
-  if (len > RARRAY_EMBED_LEN_MAX) {
-    FL_UNSET_EMBED(ary);
-    ARY_SET_PTR(ary, ALLOC_N(VALUE, len));
-    ARY_SET_CAPA(ary, len);
-    ARY_SET_HEAP_LEN(ary, len);
-  } else {
-    ARY_SET_EMBED_LEN(ary, len);
-  }
+  VALUE ary = INT2FIX(len);
+  VALUE block = push_block();
+  ary = rb_class_new_instance(1, &ary, rb_cArray);
+  pop_block(block);
   return ary;
 }
 

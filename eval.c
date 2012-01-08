@@ -13,6 +13,17 @@ static VALUE (*rb_f_p)(int, VALUE*, VALUE);
 static VALUE (*umethod_bind)(VALUE, VALUE);
 static VALUE (*rb_method_call)(int, const VALUE*, VALUE);
 
+VALUE push_block() {
+  rb_thread_t *th = GET_THREAD();
+  VALUE block = th->cfp->lfp[0];
+  th->cfp->lfp[0] = 0;
+  return block;
+}
+
+void pop_block(VALUE block) {
+  GET_THREAD()->cfp->lfp[0] = block;
+}
+
 void rb_p(VALUE obj) {
 #ifdef CREATE_CONSOLE
   VALUE v = ID2SYM(rb_intern("inspect"));
