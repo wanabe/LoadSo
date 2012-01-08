@@ -5,7 +5,7 @@ VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalse
 VALUE rb_cMethod, rb_cUnboundMethod;
 VALUE rb_mGC;
 VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError, rb_eIndexError;
-VALUE rb_eFatal;
+VALUE rb_eFatal, rb_eRangeError;
 
 static VALUE (*rb_mod_const_get)(int, VALUE*, VALUE);
 static VALUE (*rb_mod_const_set)(VALUE, VALUE, VALUE);
@@ -118,10 +118,11 @@ void Init_VariableCore() {
   rb_eSecurityError = const_get_cstr(rb_cObject, "SecurityError");
   rb_eNoMethodError = const_get_cstr(rb_cObject, "NoMethodError");
   rb_eIndexError = const_get_cstr(rb_cObject, "IndexError");
+  rb_eRangeError = const_get_cstr(rb_cObject, "RangeError");
 }
 
 void Init_Variable() {
-  VALUE ivar_table = rb_eval_string("$__loadso__ivar_table = Hash.new(false)");
+  /* VALUE ivar_table = */ rb_eval_string("$__loadso__ivar_table = Hash.new(false)");
   rb_eFatal = rb_eval_string("ObjectSpace.each_object(Class).find{|c|c.to_s=='fatal'}");
   rb_mod_const_set = get_method(rb_cObject, "const_set");
   rb_obj_ivar_set = get_method(rb_cObject, "instance_variable_set");

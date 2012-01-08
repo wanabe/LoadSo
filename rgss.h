@@ -431,7 +431,7 @@ extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb
 extern VALUE rb_cMethod, rb_cUnboundMethod;
 extern VALUE rb_mGC;
 extern VALUE rb_eRuntimeError, rb_eLoadError, rb_eTypeError, rb_eArgError, rb_eNotImpError, rb_eSecurityError, rb_eNoMethodError, rb_eIndexError;
-extern VALUE rb_eFatal;
+extern VALUE rb_eFatal, rb_eRangeError;
 
 static inline VALUE rb_class_of(VALUE obj) {
   if (IMMEDIATE_P(obj)) {
