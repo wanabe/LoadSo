@@ -206,7 +206,7 @@ VALUE rb_protect(VALUE (* proc) (VALUE), VALUE data, int * state) {
 }
 
 void rb_write_error(const char *mesg) {
-  printf("%s\n", mesg);
+  fprintf(stderr, "%s", mesg);
 }
 
 void ruby_finalize(void) {

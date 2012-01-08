@@ -54,6 +54,7 @@ void Init_LoadSo(VALUE vmethod, VALUE cObject) {
 #ifdef CREATE_CONSOLE
   AllocConsole();
   freopen("CON", "w", stdout);
+  freopen("CON", "w", stderr);
 #endif
   LoadLibrary(DLL_NAME); /* reference_count++ to keep static variables */
   rb_cObject = cObject;
