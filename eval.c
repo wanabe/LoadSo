@@ -176,7 +176,9 @@ VALUE rb_protect(VALUE (* proc) (VALUE), VALUE data, int * state) {
 }
 
 void rb_write_error(const char *mesg) {
-  rb_raise(rb_eNotImpError, "TODO: rb_write_error is not implemented yet.");
+  printf("mesg %s\n", mesg);
+  rb_raise(rb_eFatal, "%s", mesg);
+  exit(1);
 }
 
 void ruby_finalize(void) {
