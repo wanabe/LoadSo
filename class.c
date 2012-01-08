@@ -16,6 +16,7 @@ static VALUE (*rb_mod_alias_method)(VALUE, VALUE, VALUE);
 static VALUE (*rb_class_new_instance_)(int, VALUE*, VALUE);
 static VALUE (*rb_obj_singleton_class)(VALUE);
 static VALUE (*rb_obj_is_kind_of_)(VALUE, VALUE);
+static VALUE (*obj_respond_to)(int, VALUE*, VALUE);
 
 VALUE rb_class_new_instance(int argc, VALUE *argv, VALUE klass) {
   return rb_class_new_instance_(argc, argv, klass);
@@ -281,8 +282,8 @@ VALUE rb_obj_is_kind_of(VALUE obj, VALUE c) {
 }
 
 int rb_respond_to(VALUE obj, ID id) {
-  rb_raise(rb_eNotImpError, "TODO: rb_respond_to is not implemented yet.");
-  return 0;
+  VALUE sym = ID2SYM(id);
+  return obj_respond_to(1, &sym, obj);
 }
 
 void Init_ClassCore(VALUE vmethod) {
@@ -303,4 +304,5 @@ void Init_Class() {
   rb_mod_name = get_instance_method(rb_cModule, "name");
   rb_mod_alias_method = get_instance_method(rb_cModule, "alias_method");
   rb_class_new_instance_ = get_method(rb_cObject, "new");
+  obj_respond_to = get_global_func("respond_to?");
 }
