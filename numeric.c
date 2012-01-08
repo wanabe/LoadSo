@@ -103,8 +103,13 @@ unsigned LONG_LONG rb_num2ull(VALUE val) {
   return (unsigned LONG_LONG)rb_num2ll(val);
 }
 
-VALUE rb_num2ulong(VALUE val) {
-  rb_raise(rb_eNotImpError, "TODO: rb_num2ulong is not implemented yet.");
+unsigned long rb_num2ulong(VALUE val) {
+  if (TYPE(val) == T_BIGNUM) {
+    val = rb_funcall(val, rb_intern("to_s"), 0);
+    return strtoul(RSTRING_PTR(val), NULL, 0);
+  }
+  if (FIXNUM_P(val)) return (unsigned long)FIX2LONG(val);
+  rb_raise(rb_eNotImpError, "TODO: rb_num2ulong(not_int) is under construction.");
   return 0;
 }
 
