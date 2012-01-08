@@ -384,6 +384,40 @@ typedef struct OnigEncodingTypeST {
   int ruby_encoding_index;
 } OnigEncodingType, rb_encoding;
 
+#include <setjmp.h>
+#define RUBY_SETJMP(env) setjmp(env)
+#define RUBY_LONGJMP(env,val) longjmp(env,val)
+#define ruby_setjmp(env) RUBY_SETJMP(env)
+#define ruby_longjmp(env,val) RUBY_LONGJMP((env),(val))
+#define RUBY_JMP_BUF jmp_buf
+typedef RUBY_JMP_BUF rb_jmpbuf_t;
+struct rb_vm_tag {
+    rb_jmpbuf_t buf;
+    VALUE tag;
+    VALUE retval;
+    struct rb_vm_tag *prev;
+};
+#define TH_PUSH_TAG(th) do { \
+  rb_thread_t * const _th = (th); \
+  struct rb_vm_tag _tag; \
+  _tag.tag = 0; \
+  _tag.prev = _th->tag; \
+  _th->tag = &_tag;
+#define TH_POP_TAG() \
+  _th->tag = _tag.prev; \
+} while (0)
+#define TH_POP_TAG2() \
+  _th->tag = _tag.prev
+#define PUSH_TAG() TH_PUSH_TAG(GET_THREAD())
+#define POP_TAG()      TH_POP_TAG()
+#define TH_EXEC_TAG() ruby_setjmp(_th->tag->buf)
+#define EXEC_TAG() \
+  TH_EXEC_TAG()
+#define TH_JUMP_TAG(th, st) do { \
+  ruby_longjmp((th)->tag->buf,(st)); \
+} while (0)
+#define JUMP_TAG(st) TH_JUMP_TAG(GET_THREAD(), (st))
+
 enum rb_thread_status {
   THREAD_TO_KILL,
   THREAD_RUNNABLE,

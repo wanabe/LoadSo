@@ -145,8 +145,21 @@ VALUE rb_funcall2(VALUE recv, ID mid, int argc, const VALUE *argv) {
 }
 
 VALUE rb_ensure(VALUE (*b_proc)(ANYARGS), VALUE data1, VALUE (*e_proc)(ANYARGS), VALUE data2) {
-  rb_raise(rb_eNotImpError, "TODO: rb_ensure is not implemented yet.");
-  return Qnil;
+  int state;
+  volatile VALUE result = Qnil;
+
+  PUSH_TAG();
+  if ((state = EXEC_TAG()) == 0) {
+    result = (*b_proc) (data1);
+  }
+  POP_TAG();
+  /* TODO: fix me */
+  /* retval = prot_tag ? prot_tag->retval : Qnil; */     /* save retval */
+  (*e_proc) (data2);
+  fflush(stdout);
+  if (state)
+    JUMP_TAG(state);
+  return result;
 }
 
 VALUE rb_protect(VALUE (* proc) (VALUE), VALUE data, int * state) {
