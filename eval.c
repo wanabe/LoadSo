@@ -123,7 +123,7 @@ VALUE rb_apply(VALUE recv, ID mid, VALUE args) {
 }
 
 void rb_backtrace() {
-  rb_raise(rb_eNotImpError, "TODO: rb_backtrace is not implemented yet.");
+  fprintf(stderr, "TODO: rb_backtrace is not implemented yet.");
 }
 
 VALUE rb_block_call(VALUE obj, ID mid, int argc, VALUE * argv, VALUE (*bl_proc) (ANYARGS), VALUE data2) {
@@ -205,12 +205,16 @@ VALUE rb_protect(VALUE (* proc) (VALUE), VALUE data, int * state) {
     return result;
 }
 
+#include <windows.h>
 void rb_write_error(const char *mesg) {
   fprintf(stderr, "%s", mesg);
+#ifdef CREATE_CONSOLE
+  MessageBox(0, mesg, "error", 0);
+#endif
 }
 
 void ruby_finalize(void) {
-  rb_raise(rb_eNotImpError, "TODO: ruby_finalize is not implemented yet.");
+  fprintf(stderr, "TODO: ruby_finalize is not implemented yet.");
 }
 
 void Init_Eval() {
