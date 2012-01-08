@@ -12,7 +12,13 @@ static VALUE (*umethod_bind)(VALUE, VALUE);
 static VALUE (*rb_method_call)(int, const VALUE*, VALUE);
 
 void rb_p(VALUE obj) {
+#ifdef CREATE_CONSOLE
+  VALUE v = ID2SYM(rb_intern("inspect"));
+  printf("%s\n", RSTRING_PTR(rb_f_public_send(1, &v, obj)));
+  fflush(stdout);
+#else
   rb_f_p(1, &obj, Qnil);
+#endif
 }
 
 void rb_raise(VALUE exc, const char *format,...) {
