@@ -13,6 +13,7 @@
 #define RSHIFT(x,y) ((x)>>(int)(y))
 #define ALLOC(type) ((type*)malloc(sizeof(type)))
 #define ALLOC_N(type,n) ((type*)malloc((n) * sizeof(type)))
+#define MEMCPY(p1,p2,type,n) memcpy((p1), (p2), sizeof(type)*(n))
 
 typedef unsigned long VALUE;
 typedef unsigned long ID;
