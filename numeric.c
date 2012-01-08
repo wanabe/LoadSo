@@ -53,8 +53,8 @@ SIGNED_VALUE rb_num2long(VALUE val) {
 }
 
 double rb_big2dbl(VALUE x) {
-  rb_raise(rb_eNotImpError, "TODO: rb_big2dbl is not implemented yet.");
-  return 0;
+  x = rb_funcall(x, rb_intern("to_s"), 0);
+  return atof(RSTRING_PTR(x));
 }
 
 VALUE rb_fix2str(VALUE x, int base) {
