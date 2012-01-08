@@ -1,6 +1,7 @@
 #include "load_so.h"
 #include <stdio.h>
 
+static VALUE (*obj_to_enum)(int, VALUE *, VALUE);
 struct RString buf_string = {{RSTRING_NOEMBED | T_STRING, 0}};
 VALUE value_buf_string = (VALUE)&buf_string;
 
@@ -33,8 +34,10 @@ static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
 }
 
 VALUE rb_enumeratorize(VALUE obj, VALUE meth, int argc, VALUE *argv) {
-  rb_raise(rb_eNotImpError, "TODO: rb_enumeratorize is not implemented yet.");
-  return 0;
+  VALUE args = rb_ary_new_with_len(argc + 1);
+  RARRAY_PTR(args)[0] = meth;
+  MEMCPY(RARRAY_PTR(args), argv, VALUE, argc);
+  return obj_to_enum(RARRAY_LEN(args), RARRAY_PTR(args), obj);
 }
 
 void Init_ClassCore(VALUE);
@@ -75,4 +78,5 @@ void Init_LoadSo(VALUE vmethod, VALUE cObject) {
   Init_Thread();
 
   rb_define_global_function("load_so", load_so, 2);
+  obj_to_enum = get_global_func("to_enum");
 }
