@@ -1,4 +1,9 @@
 #include "load_so.h"
+#include <stdio.h>
+
+#define LLONG_MIN_MINUS_ONE ((double)LLONG_MIN-1)
+#define LLONG_MAX_PLUS_ONE (2*(double)(LLONG_MAX/2+1))
+#define ULLONG_MAX_PLUS_ONE (2*(double)(ULLONG_MAX/2+1))
 
 VALUE (*fix_and)(VALUE, VALUE);
 VALUE (*rb_fix_lshift)(VALUE, VALUE);
@@ -61,15 +66,41 @@ VALUE rb_fix2str(VALUE x, int base) {
   rb_raise(rb_eNotImpError, "TODO: rb_fix2str is not implemented yet.");
   return 0;
 }
+
 #define LONG_LONG long long
+
+LONG_LONG rb_big2ll(VALUE x) {
+  x = rb_funcall(x, rb_intern("to_s"), 0);
+  return atoll(RSTRING_PTR(x));
+}
+
+unsigned LONG_LONG rb_big2ull(VALUE x) {
+  x = rb_funcall(x, rb_intern("to_s"), 0);
+  return strtoull(RSTRING_PTR(x), NULL, 10);
+}
+
 LONG_LONG rb_num2ll(VALUE val) {
-  rb_raise(rb_eNotImpError, "TODO: rb_num2ll is not implemented yet.");
-  return 0;
+  if (FIXNUM_P(val)) return (LONG_LONG)FIX2LONG(val);
+  switch (TYPE(val)) {
+  case T_FLOAT:
+    if (RFLOAT_VALUE(val) < LLONG_MAX_PLUS_ONE
+        && RFLOAT_VALUE(val) > LLONG_MIN_MINUS_ONE) {
+      return (LONG_LONG)(RFLOAT_VALUE(val));
+    } else {
+      rb_raise(rb_eRangeError, "out of range");
+    }
+  case T_BIGNUM:
+    return rb_big2ll(val);
+  }
+  rb_raise(rb_eNotImpError, "TODO: rb_num2ll(not_int_or_float) is under construction.");
+  return Qnil; /* not reached */
 }
 
 unsigned LONG_LONG rb_num2ull(VALUE val) {
-  rb_raise(rb_eNotImpError, "TODO: rb_num2ull is not implemented yet.");
-  return 0;
+  if (TYPE(val) == T_BIGNUM) {
+    return rb_big2ull(val);
+  }
+  return (unsigned LONG_LONG)rb_num2ll(val);
 }
 
 VALUE rb_num2ulong(VALUE val) {
@@ -77,14 +108,26 @@ VALUE rb_num2ulong(VALUE val) {
   return 0;
 }
 
+VALUE rb_ull2big(unsigned LONG_LONG n) {
+  char buf[20 + 1]; /* Math.log10(1<<64) < 20 */
+  snprintf(buf, sizeof(buf), "%llu", n);
+  return rb_eval_string(buf);
+}
+
+VALUE rb_ll2big(LONG_LONG n) {
+  char buf[20 + 1]; /* Math.log10(1<<64) < 20 */
+  snprintf(buf, sizeof(buf), "%lld", n);
+  return rb_eval_string(buf);
+}
+
 VALUE rb_ull2inum(unsigned LONG_LONG n) {
-  rb_raise(rb_eNotImpError, "TODO: rb_ull2inum is not implemented yet.");
-  return 0;
+  if (POSFIXABLE(n)) return INT2FIX(n);
+  return rb_ull2big(n);
 }
 
 VALUE rb_ll2inum(LONG_LONG n) {
-  rb_raise(rb_eNotImpError, "TODO: rb_ll2inum is not implemented yet.");
-  return 0;
+  if (FIXABLE(n)) return INT2FIX(n);
+  return rb_ll2big(n);
 }
 
 void Init_Numeric() {

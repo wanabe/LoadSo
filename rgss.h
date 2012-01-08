@@ -15,6 +15,25 @@
 #define ALLOC_N(type,n) ((type*)malloc((n) * sizeof(type)))
 #define MEMCPY(p1,p2,type,n) memcpy((p1), (p2), sizeof(type)*(n))
 
+#ifdef __STDC__
+# include <limits.h>
+#else
+# ifndef LONG_MAX
+#  ifdef HAVE_LIMITS_H
+#   include <limits.h>
+#  else
+    /* assuming 32bit(2's compliment) long */
+#   define LONG_MAX 2147483647
+#  endif
+# endif
+# ifndef LONG_MIN
+#  define LONG_MIN (-LONG_MAX-1)
+# endif
+# ifndef CHAR_BIT
+#  define CHAR_BIT 8
+# endif
+#endif
+
 typedef unsigned long VALUE;
 typedef unsigned long ID;
 #define SIGNED_VALUE long
@@ -42,7 +61,14 @@ enum ruby_special_consts {
 #define SYM2ID(x) RSHIFT((unsigned long)(x),RUBY_SPECIAL_SHIFT)
 #define ID_ALLOCATOR 1
 
+#define FIXNUM_MAX (LONG_MAX>>1)
+#define FIXNUM_MIN RSHIFT((long)LONG_MIN,1)
 #define INT2FIX(i) ((VALUE)(((SIGNED_VALUE)(i))<<1 | FIXNUM_FLAG))
+#define FIX2LONG(x) RSHIFT((SIGNED_VALUE)x,1)
+#define FIX2ULONG(x) ((((VALUE)(x))>>1)&LONG_MAX)
+#define POSFIXABLE(f) ((f) < FIXNUM_MAX+1)
+#define NEGFIXABLE(f) ((f) >= FIXNUM_MIN)
+#define FIXABLE(f) (POSFIXABLE(f) && NEGFIXABLE(f))
 
 #define FL_SINGLETON FL_USER0
 #define FL_MARK      (((VALUE)1)<<5)
@@ -147,7 +173,6 @@ enum ruby_value_type {
 
 #define FL_SET(x,f) do {if (FL_ABLE(x)) RBASIC(x)->flags |= (f);} while (0)
 #define FL_UNSET(x,f) do {if (FL_ABLE(x)) RBASIC(x)->flags &= ~(f);} while (0)
-#define FIX2LONG(x) (long)RSHIFT((SIGNED_VALUE)(x),1)
 
 struct RBasic {
   VALUE flags;
