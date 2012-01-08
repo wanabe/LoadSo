@@ -170,9 +170,39 @@ VALUE rb_ensure(VALUE (*b_proc)(ANYARGS), VALUE data1, VALUE (*e_proc)(ANYARGS),
   return result;
 }
 
+void rb_fiber_start(void) {
+  fprintf(stderr, "TODO: rb_fiber_start is under construction\n");
+}
+
 VALUE rb_protect(VALUE (* proc) (VALUE), VALUE data, int * state) {
-  rb_raise(rb_eNotImpError, "TODO: rb_protect is not implemented yet.");
-  return Qnil;
+    volatile VALUE result = Qnil;
+    int status;
+    rb_thread_t *th = GET_THREAD();
+    rb_control_frame_t *cfp = th->cfp;
+    struct rb_vm_protect_tag protect_tag;
+    rb_jmpbuf_t org_jmpbuf;
+
+    protect_tag.prev = th->protect_tag;
+
+    PUSH_TAG();
+    th->protect_tag = &protect_tag;
+    MEMCPY(&org_jmpbuf, &(th)->root_jmpbuf, rb_jmpbuf_t, 1);
+    if ((status = EXEC_TAG()) == 0) {
+	SAVE_ROOT_JMPBUF(th, result = (*proc) (data));
+    }
+    MEMCPY(&(th)->root_jmpbuf, &org_jmpbuf, rb_jmpbuf_t, 1);
+    th->protect_tag = protect_tag.prev;
+    POP_TAG();
+
+    if (state) {
+	*state = status;
+    }
+    if (status != 0) {
+	th->cfp = cfp;
+	return Qnil;
+    }
+
+    return result;
 }
 
 void rb_write_error(const char *mesg) {
