@@ -81,7 +81,7 @@ VALUE rb_funcall(VALUE recv, ID mid, int n, ...) {
   va_list ar;
   int i;
   VALUE ary = INT2FIX(n + 2), *ptr;
-
+ 
   ary = rb_class_new_instance(1, &ary, rb_cArray);
   ptr = RARRAY_PTR(ary);
   ptr[0] = ID2SYM(rb_intern("__send__"));
@@ -94,9 +94,23 @@ VALUE rb_funcall(VALUE recv, ID mid, int n, ...) {
   return rb_f_public_send(n + 2, ptr, recv);
 }
 
+VALUE rb_funcall2(VALUE recv, ID mid, int argc, const VALUE *argv) {
+  VALUE ary = rb_ary_new_with_len(argc + 2);
+  VALUE *ptr = RARRAY_PTR(ary);
+
+  ptr[0] = ID2SYM(rb_intern("__send__"));
+  ptr[1] = ID2SYM(mid);
+  MEMCPY(ptr + 2, argv, VALUE, argc);
+  return rb_f_public_send(argc + 2, ptr, recv);
+}
+
+VALUE rb_apply(VALUE recv, ID mid, VALUE args) {
+  return rb_funcall2(recv, mid, RARRAY_LEN(args), RARRAY_PTR(args));
+}
+
 VALUE rb_funcall3(VALUE recv, ID mid, int argc, const VALUE *argv) {
   VALUE ary = INT2FIX(argc + 1), *ptr;
-
+ 
   ary = rb_class_new_instance(1, &ary, rb_cArray);
   ptr = RARRAY_PTR(ary);
   ptr[0] = ID2SYM(mid);
@@ -115,11 +129,6 @@ VALUE rb_call_super(int argc, const VALUE *argv) {
   method = rb_instance_method(klass, id);
   method = umethod_bind(method, th->cfp->self);
   return rb_method_call(argc, argv, method);
-}
-
-VALUE rb_apply(VALUE recv, ID mid, VALUE args) {
-  rb_raise(rb_eNotImpError, "TODO: rb_apply is not implemented yet.");
-  return Qnil;
 }
 
 void rb_backtrace() {
@@ -145,11 +154,6 @@ static ID frame_func_id(rb_control_frame_t *cfp) {
 }
 ID rb_frame_this_func(void) {
   return frame_func_id(GET_THREAD()->cfp);
-}
-
-VALUE rb_funcall2(VALUE recv, ID mid, int argc, const VALUE *argv) {
-  rb_raise(rb_eNotImpError, "TODO: rb_funcall2 is not implemented yet.");
-  return Qnil;
 }
 
 VALUE rb_ensure(VALUE (*b_proc)(ANYARGS), VALUE data1, VALUE (*e_proc)(ANYARGS), VALUE data2) {

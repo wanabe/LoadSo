@@ -27,7 +27,7 @@ VALUE rb_ary_new() {
   return rb_class_new_instance(0, NULL, rb_cArray);
 }
 
-static VALUE rb_ary_new_with_len(long len) {
+VALUE rb_ary_new_with_len(long len) {
   VALUE ary = rb_ary_new();
   if (len > RARRAY_EMBED_LEN_MAX) {
     FL_UNSET_EMBED(ary);
