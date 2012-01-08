@@ -82,8 +82,8 @@ void rb_mark_hash(st_table *tbl) {
 }
 
 int rb_during_gc(void) {
-  rb_raise(rb_eNotImpError, "TODO: rb_during_gc is not implemented yet.");
-  return 1;
+  //rb_raise(rb_eNotImpError, "TODO: rb_during_gc is not implemented yet.");
+  return 0;
 }
 
 void Init_ObjSpace() {
