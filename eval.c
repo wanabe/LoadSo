@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "load_so.h"
+#include "st.h"
+#include "eval.h"
 
 static VALUE (*rb_f_eval)(int, VALUE*, VALUE);
 static VALUE (*rb_f_raise)(int, VALUE*);

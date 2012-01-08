@@ -1,4 +1,6 @@
 #include "load_so.h"
+#include "st.h"
+#include "eval.h"
 
 #define GetThreadPtr(obj, ptr) \
     TypedData_Get_Struct((obj), rb_thread_t, ptr_ruby_thread_data_type, (ptr))

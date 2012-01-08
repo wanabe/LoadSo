@@ -15,7 +15,6 @@ VALUE set_buf_string2(const char*, long);
 cfunc get_method(VALUE, char*);
 cfunc get_global_func(char*);
 cfunc get_instance_method(VALUE, char*);
-rb_thread_t *get_thread(VALUE);
 VALUE rb_instance_method(VALUE, ID);
 
 VALUE rb_thread_current();
