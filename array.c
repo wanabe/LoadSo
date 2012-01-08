@@ -5,6 +5,7 @@ static VALUE (*rb_ary_join_m)(int, VALUE*, VALUE);
 static VALUE (*rb_ary_clear_)(VALUE);
 static VALUE (*rb_ary_concat_)(VALUE, VALUE);
 static VALUE (*rb_ary_unshift_m)(int, VALUE*, VALUE);
+static VALUE (*rb_ary_delete_at_m)(VALUE, VALUE);
 
 VALUE rb_ary_new() {
   return rb_class_new_instance(0, NULL, rb_cArray);
@@ -69,8 +70,7 @@ VALUE rb_ary_unshift(VALUE ary, VALUE item) {
 }
 
 VALUE rb_ary_delete_at(VALUE ary, long pos) {
-  rb_raise(rb_eNotImpError, "TODO: rb_ary_delete_at is not implemented yet.");
-  return Qnil;
+  return rb_ary_delete_at_m(ary, INT2FIX(pos));
 }
 
 void rb_ary_store(VALUE ary, long idx, VALUE val) {
@@ -83,4 +83,5 @@ void Init_Array() {
   rb_ary_clear_ = get_instance_method(rb_cArray, "clear");
   rb_ary_concat_ = get_instance_method(rb_cArray, "concat");
   rb_ary_unshift_m = get_instance_method(rb_cArray, "unshift");
+  rb_ary_delete_at_m = get_instance_method(rb_cArray, "delete_at");
 }
