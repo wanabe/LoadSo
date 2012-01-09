@@ -4,6 +4,7 @@
  */
 
 #include <stdarg.h>
+#include <windows.h>
 
 #ifdef __cplusplus
 #define ANYARGS ...
@@ -470,3 +471,16 @@ static inline VALUE rb_class_of(VALUE obj) {
   }
   return RBASIC(obj)->klass;
 }
+
+typedef struct {
+  char reserved[8]; /* TODO */
+  BITMAPINFOHEADER *info;
+  char reserved2[4]; /* TODO */
+  void *buffer;
+} RgssBitmapData;
+typedef struct {
+  char reserved[8]; /* TODO */
+  RgssBitmapData *data;
+  char reserved2[16]; /* TODO */
+} RgssBitmap;
+#define RGSS_BITMAPDATA(val)   (((RgssBitmap*)(DATA_PTR(val)))->data)
