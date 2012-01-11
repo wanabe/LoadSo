@@ -298,6 +298,13 @@ struct RTypedData {
 #define RTYPEDDATA_P(v)    (RTYPEDDATA(v)->typed_flag == 1)
 #define RTYPEDDATA_TYPE(v) (RTYPEDDATA(v)->type)
 #define RTYPEDDATA_DATA(v) (RTYPEDDATA(v)->data)
+#define TypedData_Wrap_Struct(klass,data_type,sval)\
+  rb_data_typed_object_alloc(klass,sval,data_type)
+#define TypedData_Make_Struct(klass, type, data_type, sval) (\
+    sval = ALLOC(type),\
+    memset(sval, 0, sizeof(type)),\
+    TypedData_Wrap_Struct(klass,data_type,sval)\
+)
 #define TypedData_Get_Struct(obj,type,data_type,sval) do {\
   (sval) = (type*)DATA_PTR(obj);\
 } while(0) /* TODO: type check */

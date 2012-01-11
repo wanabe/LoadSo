@@ -86,6 +86,20 @@ int rb_during_gc(void) {
   return 0;
 }
 
+VALUE rb_data_typed_object_alloc(VALUE klass, void *datap, const rb_data_type_t *type) {
+  NEWOBJ(data, struct RTypedData);
+
+  /* if (klass) Check_Type(klass, T_CLASS); */
+
+  OBJSETUP(data, klass, T_DATA);
+
+  data->data = datap;
+  data->typed_flag = 1;
+  data->type = type;
+
+  return (VALUE)data;
+}
+
 void Init_ObjSpace() {
   rb_eval_string("$__loadso__global_list = []");
   rb_gc_start = get_method(rb_mGC, "start");
