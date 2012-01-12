@@ -23,6 +23,8 @@ static VALUE (*rb_ary_concat_)(VALUE, VALUE);
 static VALUE (*rb_ary_unshift_m)(int, VALUE*, VALUE);
 static VALUE (*rb_ary_delete_at_m)(VALUE, VALUE);
 static VALUE (*rb_ary_aset)(int, VALUE*, VALUE);
+static VALUE (*rb_ary_delete_)(VALUE, VALUE);
+
 
 VALUE rb_ary_new() {
   return rb_class_new_instance(0, NULL, rb_cArray);
@@ -102,6 +104,10 @@ void rb_ary_store(VALUE ary, long idx, VALUE val) {
   rb_ary_aset(2, argv, ary);
 }
 
+VALUE rb_ary_delete(VALUE ary, VALUE item) {
+  return rb_ary_delete_(ary, item);
+}
+
 void Init_Array() {
   rb_ary_push_m = get_instance_method(rb_cArray, "push");
   rb_ary_join_m = get_instance_method(rb_cArray, "join");
@@ -110,4 +116,5 @@ void Init_Array() {
   rb_ary_unshift_m = get_instance_method(rb_cArray, "unshift");
   rb_ary_delete_at_m = get_instance_method(rb_cArray, "delete_at");
   rb_ary_aset = get_instance_method(rb_cArray, "[]=");
+  rb_ary_delete_ = get_instance_method(rb_cArray, "delete");
 }
