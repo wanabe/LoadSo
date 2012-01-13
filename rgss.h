@@ -491,3 +491,12 @@ typedef struct {
   char reserved2[16]; /* TODO */
 } RgssBitmap;
 #define RGSS_BITMAPDATA(val)   (((RgssBitmap*)(DATA_PTR(val)))->data)
+
+typedef struct {
+  char reserved[8]; /* TODO */
+  int x;
+  int y;
+  int w;
+  int h;
+} RgssRect;
+#define RGSS_RECT(val) ((RgssRect*)(DATA_PTR(val)))
