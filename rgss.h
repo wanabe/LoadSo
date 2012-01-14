@@ -67,6 +67,8 @@ enum ruby_special_consts {
 #define INT2FIX(i) ((VALUE)(((SIGNED_VALUE)(i))<<1 | FIXNUM_FLAG))
 #define FIX2LONG(x) RSHIFT((SIGNED_VALUE)x,1)
 #define FIX2ULONG(x) ((((VALUE)(x))>>1)&LONG_MAX)
+#define FIX2INT(x) ((int)FIX2LONG(x))
+#define FIX2UINT(x) ((int)FIX2ULONG(x))
 #define POSFIXABLE(f) ((f) < FIXNUM_MAX+1)
 #define NEGFIXABLE(f) ((f) >= FIXNUM_MIN)
 #define FIXABLE(f) (POSFIXABLE(f) && NEGFIXABLE(f))
@@ -478,6 +480,16 @@ static inline VALUE rb_class_of(VALUE obj) {
   }
   return RBASIC(obj)->klass;
 }
+
+#define NUM2LONG_internal(x) (FIXNUM_P(x) ? FIX2LONG(x) : rb_num2long(x))
+#ifdef __GNUC__
+#define NUM2LONG(x) \
+  __extension__ ({VALUE num2long_x = (x); NUM2LONG_internal(num2long_x);})
+#else
+static inline long NUM2LONG(VALUE x) {
+  return NUM2LONG_internal(x);
+}
+#endif
 
 typedef struct {
   char reserved[8]; /* TODO */
