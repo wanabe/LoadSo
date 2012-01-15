@@ -437,29 +437,48 @@ typedef struct OnigEncodingTypeST {
 #define RUBY_EVENT_SWITCH   0x20000
 #define RUBY_EVENT_COVERAGE 0x40000
 
-VALUE rb_newobj();
+/* eval.c */
 void rb_raise(VALUE, const char*,...);
-VALUE rb_const_get(VALUE, ID);
-ID rb_intern(const char*);
-VALUE rb_define_module_under(VALUE, const char*);
-VALUE rb_define_module(const char*);
-void rb_const_set(VALUE, ID, VALUE);
-void rb_define_singleton_method(VALUE, const char*, VALUE (*)(ANYARGS), int);
-VALUE rb_ary_new();
-VALUE rb_ary_new4(long, const VALUE*);
 int rb_block_given_p();
 VALUE rb_block_proc();
 VALUE rb_eval_string(const char*);
-VALUE rb_class_new_instance(int, VALUE*, VALUE);
-void rb_define_global_function(const char*, VALUE (*)(ANYARGS), int);
+VALUE rb_funcall(VALUE, ID, int, ...);
+VALUE rb_funcall2(VALUE, ID, int, const VALUE*);
 VALUE rb_funcall3(VALUE, ID, int, const VALUE*);
+/* objspace.c */
+VALUE rb_newobj();
 void rb_gc_mark(VALUE);
+VALUE rb_data_typed_object_alloc(VALUE, void*, const rb_data_type_t*);
+/* class.c */
+VALUE rb_define_module_under(VALUE, const char*);
+VALUE rb_define_module(const char*);
+VALUE rb_define_class_under(VALUE, const char*, VALUE);
+void rb_define_method(VALUE, const char *, VALUE(*)(ANYARGS), int);
+void rb_define_singleton_method(VALUE, const char*, VALUE (*)(ANYARGS), int);
+void rb_define_global_function(const char*, VALUE (*)(ANYARGS), int);
+void rb_define_alias(VALUE, const char*, const char*);
+void rb_define_alloc_func(VALUE, VALUE(*)(VALUE));
+VALUE rb_class_new_instance(int, VALUE*, VALUE);
+int rb_scan_args(int, const VALUE*, const char*, ...);
+/* array.c */
+VALUE rb_ary_new();
+VALUE rb_ary_new4(long, const VALUE*);
 VALUE rb_ary_push(VALUE, VALUE);
+VALUE rb_ary_delete(VALUE, VALUE);
+/* string.c */
 VALUE rb_vsprintf(const char*, va_list);
+ID rb_intern(const char*);
+/* hash.c */
+VALUE rb_hash_new();
 VALUE rb_hash_aref(VALUE, VALUE);
 VALUE rb_hash_aset(VALUE, VALUE, VALUE);
-VALUE rb_funcall(VALUE, ID, int, ...);
-VALUE rb_hash_new();
+/* variable.c */
+VALUE rb_ivar_get(VALUE, ID);
+void rb_const_set(VALUE, ID, VALUE);
+VALUE rb_const_get(VALUE, ID);
+VALUE rb_ivar_set(VALUE, ID, VALUE);
+/* numeric.c */
+SIGNED_VALUE rb_num2long(VALUE);
 
 extern VALUE rb_cObject, rb_mKernel, rb_cModule, rb_cClass, rb_cArray, rb_cString, rb_cFloat, rb_cHash, rb_cProc, rb_cData;
 extern VALUE rb_cFixnum, rb_cBignum, rb_cTrueClass, rb_cSymbol, rb_cNilClass, rb_cFalseClass, rb_cTime, rb_cEncoding, rb_cThread;
