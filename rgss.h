@@ -531,3 +531,12 @@ typedef struct {
   int h;
 } RgssRect;
 #define RGSS_RECT(val) ((RgssRect*)(DATA_PTR(val)))
+
+typedef struct {
+  char reserved[8]; /* TODO */
+  int dim;
+  int x, y, z;
+  int total;
+  short *data;
+} RgssTable;
+#define RGSS_TABLE(val) ((RgssTable*)(DATA_PTR(val)))
