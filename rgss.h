@@ -535,8 +535,9 @@ typedef struct {
 typedef struct {
   char reserved[8]; /* TODO */
   int dim;
-  int x, y, z;
+  int xsize, ysize, zsize;
   int total;
   short *data;
 } RgssTable;
 #define RGSS_TABLE(val) ((RgssTable*)(DATA_PTR(val)))
+#define RGSS_TABLE_DATA(table, x, y, z) table->data[x + table->xsize * (y + table->ysize * z)]
