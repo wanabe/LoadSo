@@ -50,12 +50,14 @@ VALUE rb_ivar_set(VALUE obj, ID id, VALUE val) {
   if(is_instance_id(id)) {
     return rb_obj_ivar_set(obj, ID2SYM(id), val);
   }
+  /* TODO
   switch (TYPE(obj)) {
   case T_OBJECT:
   case T_CLASS:
   case T_MODULE:
     rb_raise(rb_eNotImpError, "TODO: rb_ivar_set(obj_or_class_or_mod, :not_ivar_name, val) is not implemented yet.");
   }
+   */
   ivar_table = rb_eval_string("$__loadso__ivar_table");
   inner_table = rb_hash_aref(ivar_table, obj);
   if(!inner_table) {
@@ -70,12 +72,14 @@ VALUE rb_ivar_get(VALUE obj, ID id) {
   if(is_instance_id(id)) {
     return rb_obj_ivar_get(obj, ID2SYM(id));
   }
+  /* TODO
   switch (TYPE(obj)) {
   case T_OBJECT:
   case T_CLASS:
   case T_MODULE:
     rb_raise(rb_eNotImpError, "TODO: rb_ivar_get(obj_or_class_or_mod, :not_ivar_name, val) is not implemented yet.");
   }
+   */
   ivar_table = rb_eval_string("$__loadso__ivar_table");
   inner_table = rb_hash_aref(ivar_table, obj);
   if(!inner_table) {
