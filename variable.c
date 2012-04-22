@@ -84,6 +84,11 @@ VALUE rb_ivar_get(VALUE obj, ID id) {
   return rb_hash_aref(inner_table, ID2SYM(id));
 }
 
+VALUE rb_path2class(const char *path) {
+  /* TODO: too insecure and slow. */
+  return rb_eval_string(path);
+}
+
 void Init_VariableCore() {
   rb_mod_const_get = get_method(rb_cObject, "const_get");
 
