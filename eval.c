@@ -338,6 +338,10 @@ void ruby_finalize(void) {
   fprintf(stderr, "TODO: ruby_finalize is not implemented yet.");
 }
 
+VALUE rb_require(const char *fname) {
+  return rb_funcall(rb_mKernel, rb_intern("require"), 1, rb_str_new_cstr(fname));
+}
+
 void Init_Eval() {
   rb_f_eval = get_global_func("eval");
   rb_f_raise = get_global_func("raise");
