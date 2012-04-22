@@ -25,6 +25,17 @@ VALUE rb_hash_aset(VALUE hash, VALUE key, VALUE val) {
   return rb_hash_aset_(hash, key, val);
 }
 
+VALUE
+rb_hash_has_key(VALUE hash, VALUE key)
+{
+    if (!RHASH(hash)->ntbl)
+        return Qfalse;
+    if (st_lookup(RHASH(hash)->ntbl, key, 0)) {
+	return Qtrue;
+    }
+    return Qfalse;
+}
+
 void Init_Hash() {
   ptr_objhash = RHASH(rb_class_new_instance(0, NULL, rb_cHash))->ntbl->type;
   rb_hash_aref_ = get_instance_method(rb_cHash, "[]");
