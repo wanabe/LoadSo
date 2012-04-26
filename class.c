@@ -296,6 +296,10 @@ VALUE rb_obj_clone(VALUE obj) {
   return rb_obj_clone_(obj);
 }
 
+VALUE rb_obj_alloc(VALUE klass) {
+  return rb_funcall(klass, ID_ALLOCATOR, 0, 0); /* TODO: check obj/klass */
+}
+
 void Init_ClassCore(VALUE vmethod) {
   struct METHOD *method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
 
