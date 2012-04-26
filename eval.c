@@ -355,6 +355,10 @@ rb_obj_call_init(VALUE obj, int argc, VALUE *argv)
     rb_funcall2(obj, rb_intern("initialize"), argc, argv);
 }
 
+void rb_error_frozen(const char* what) {
+  rb_raise(rb_eTypeError, "can't modify frozen %s", what);
+}
+
 void Init_Eval() {
   rb_f_eval = get_global_func("eval");
   rb_f_raise = get_global_func("raise");
