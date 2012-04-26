@@ -30,7 +30,7 @@ static VALUE load_so(VALUE self, VALUE file, VALUE init_name) {
     rb_raise(rb_eLoadError, "Can't Init: %s", RSTRING_PTR(file));
   }
   init_func();
-  return Qnil;
+  return Qtrue;
 }
 
 VALUE rb_enumeratorize(VALUE obj, VALUE meth, int argc, VALUE *argv) {
