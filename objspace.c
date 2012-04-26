@@ -70,6 +70,10 @@ void *ruby_xmalloc2(size_t n, size_t size) {
   return malloc(n * size);
 }
 
+void ruby_xfree(void *x) {
+    return free(x);
+}
+
 static int mark_keyvalue(VALUE key, VALUE value, st_data_t data) {
   rb_gc_mark(key);
   rb_gc_mark(value);
