@@ -28,6 +28,18 @@ VALUE rb_str_cat2(VALUE str, const char *ptr) {
   return str;
 }
 
+VALUE
+rb_str_buf_cat(VALUE str, const char *ptr, long len)
+{
+    return rb_str_cat(str, ptr, len);
+}
+
+VALUE
+rb_str_buf_cat2(VALUE str, const char *ptr)
+{
+    return rb_str_buf_cat(str, ptr, strlen(ptr));
+}
+
 VALUE rb_str_new(const char *ptr, long len) {
   return rb_str_cat(rb_class_new_instance(0, NULL, rb_cString), ptr, len);
 }
@@ -36,6 +48,24 @@ VALUE rb_str_new_cstr(const char *ptr) {
   VALUE str = rb_class_new_instance(0, NULL, rb_cString);
   str = rb_str_concat_(str, set_buf_string(ptr));
   return str;
+}
+
+#define STR_BUF_MIN_SIZE 128
+
+VALUE
+rb_str_buf_new(long capa)
+{
+    VALUE str = rb_class_new_instance(0, NULL, rb_cString);
+
+    if (capa < STR_BUF_MIN_SIZE) {
+	capa = STR_BUF_MIN_SIZE;
+    }
+    FL_SET(str, RSTRING_NOEMBED);
+    RSTRING(str)->as.heap.aux.capa = capa;
+    RSTRING(str)->as.heap.ptr = ALLOC_N(char, capa+1);
+    RSTRING(str)->as.heap.ptr[0] = '\0';
+
+    return str;
 }
 
 int ruby_snprintf(char *str, size_t n, char const *fmt, ...) {
@@ -109,6 +139,10 @@ int rb_str_cmp(VALUE str1, VALUE str2) {
 
 VALUE rb_str_append(VALUE str, VALUE str2) {
   return rb_str_concat_(str, str2);
+}
+
+VALUE rb_str_buf_append(VALUE str, VALUE str2) {
+  return rb_str_concat_(str, str2); /* TODO: correct? */
 }
 
 VALUE rb_str_concat(VALUE str, VALUE str2) {
