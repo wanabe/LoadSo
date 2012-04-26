@@ -176,6 +176,7 @@ enum ruby_value_type {
 
 #define FL_SET(x,f) do {if (FL_ABLE(x)) RBASIC(x)->flags |= (f);} while (0)
 #define FL_UNSET(x,f) do {if (FL_ABLE(x)) RBASIC(x)->flags &= ~(f);} while (0)
+#define OBJ_FROZEN(x) (!!FL_TEST((x), FL_FREEZE))
 
 struct RBasic {
   VALUE flags;
