@@ -18,6 +18,7 @@ static VALUE (*rb_obj_singleton_class)(VALUE);
 static VALUE (*rb_obj_is_kind_of_)(VALUE, VALUE);
 static VALUE (*obj_respond_to)(int, VALUE*, VALUE);
 static VALUE (*rb_obj_class_)(VALUE);
+static VALUE (*rb_obj_clone_)(VALUE);
 
 VALUE rb_class_new_instance(int argc, VALUE *argv, VALUE klass) {
   return rb_class_new_instance_(argc, argv, klass);
@@ -291,6 +292,10 @@ VALUE rb_obj_class(VALUE obj) {
   return rb_obj_class_(obj);
 }
 
+VALUE rb_obj_clone(VALUE obj) {
+  return rb_obj_clone_(obj);
+}
+
 void Init_ClassCore(VALUE vmethod) {
   struct METHOD *method = (struct METHOD*)RTYPEDDATA_DATA(vmethod);
 
@@ -311,4 +316,5 @@ void Init_Class() {
   rb_class_new_instance_ = get_method(rb_cObject, "new");
   obj_respond_to = get_global_func("respond_to?");
   rb_obj_class_ = get_instance_method(rb_mKernel, "class");
+  rb_obj_clone_ = get_instance_method(rb_mKernel, "clone");
 }
