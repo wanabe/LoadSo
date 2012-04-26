@@ -40,8 +40,15 @@ rb_str_buf_cat2(VALUE str, const char *ptr)
     return rb_str_buf_cat(str, ptr, strlen(ptr));
 }
 
-VALUE rb_str_new(const char *ptr, long len) {
-  return rb_str_cat(rb_class_new_instance(0, NULL, rb_cString), ptr, len);
+VALUE rb_str_new(char *ptr, long len) {
+  VALUE val;
+  if (ptr) {
+    return rb_str_cat(rb_class_new_instance(0, NULL, rb_cString), ptr, len);
+  }
+  ptr = calloc(len, 1);
+  val = rb_str_cat(rb_class_new_instance(0, NULL, rb_cString), ptr, len);
+  free(ptr);
+  return val;
 }
 
 VALUE rb_str_new_cstr(const char *ptr) {
