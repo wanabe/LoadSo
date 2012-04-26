@@ -342,6 +342,13 @@ VALUE rb_require(const char *fname) {
   return rb_funcall(rb_mKernel, rb_intern("require"), 1, rb_str_new_cstr(fname));
 }
 
+void
+rb_obj_call_init(VALUE obj, int argc, VALUE *argv)
+{
+    PASS_PASSED_BLOCK();
+    rb_funcall2(obj, rb_intern("initialize"), argc, argv);
+}
+
 void Init_Eval() {
   rb_f_eval = get_global_func("eval");
   rb_f_raise = get_global_func("raise");

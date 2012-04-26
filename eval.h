@@ -473,11 +473,21 @@ typedef struct RNode {
 #define VM_FRAME_MAGIC_LAMBDA 0xa1
 #define VM_FRAME_MAGIC_MASK_BITS   8
 #define VM_FRAME_MAGIC_MASK   (~(~0<<VM_FRAME_MAGIC_MASK_BITS))
+#define VM_FRAME_FLAG_PASSED 0x0100
 
 #define GC_GUARDED_PTR_REF(p) ((void *)(((VALUE)(p)) & ~0x03))
 #define RUBY_VM_GET_BLOCK_PTR_IN_CFP(cfp) ((rb_block_t *)(&(cfp)->self))
 #define VM_FRAME_TYPE(cfp) ((cfp)->flag & VM_FRAME_MAGIC_MASK)
 #define RUBY_VM_PREVIOUS_CONTROL_FRAME(cfp) ((cfp)+1)
+#define PASS_PASSED_BLOCK_TH(th) do { \
+    (th)->passed_block = GC_GUARDED_PTR_REF((rb_block_t *)(th)->cfp->lfp[0]); \
+    (th)->cfp->flag |= VM_FRAME_FLAG_PASSED; \
+} while (0)
+#define PASS_PASSED_BLOCK() do { \
+    rb_thread_t * const __th__ = GET_THREAD(); \
+    PASS_PASSED_BLOCK_TH(__th__); \
+} while (0)
+
 
 void rb_threadptr_exec_event_hooks(rb_thread_t *th, rb_event_flag_t flag, VALUE self, ID id, VALUE klass);
 #define EXEC_EVENT_HOOK(th, flag, self, id, klass) do { \
