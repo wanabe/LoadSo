@@ -12,17 +12,22 @@ def require(name)
     type = $1.intern
     ''
   end
-  $:.each do |dir|
+  if name =~ /^[A-Z]:/
+    dirs = [""]
+  else
+    dirs = $:.map{|dir| "#{dir}/"}
+  end
+  dirs.each do |dir|
     if type != :rb
-      file = "#{dir}/#{name}.so"
+      file = "#{dir}#{name}.so"
       return require_so(file) if File.exist?(file)
     end
     if type != :so
-      file = "#{dir}/#{name}.rb"
+      file = "#{dir}#{name}.rb"
       return require_rb(file) if File.exist?(file)
     end
   end
-  require_rb(name) # raise LoadError
+  raise LoadError
 end
 $:.push "./Data/lib", "./Data/ext"
 $:.uniq!
