@@ -342,6 +342,12 @@ VALUE rb_require(const char *fname) {
   return rb_funcall(rb_mKernel, rb_intern("require"), 1, rb_str_new_cstr(fname));
 }
 
+void rb_check_frozen(VALUE obj) {
+  if (OBJ_FROZEN(obj)) {
+    rb_raise(rb_eRuntimeError, "can't modify frozen %s", rb_obj_classname(obj));
+  }
+}
+
 void
 rb_obj_call_init(VALUE obj, int argc, VALUE *argv)
 {
