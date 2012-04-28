@@ -1,6 +1,10 @@
 # encoding: utf-8
 # 準備：
-# 1. DevKit, ruby 1.9.2, RubyInline の inline.rb を用意する
+# 1. DevKit, ruby 1.9.2, RubyInline の inline.rb を用意する。それぞれ、
+#    http://rubyinstaller.org/downloads/ の「Development Kit」セクション、
+#    同上 URL の Ruby 1.9.2、
+#    https://raw.github.com/seattlerb/rubyinline/master/lib/inline.rb
+#    あたりから。
 #
 # 2. ゲームの Data フォルダ内に lib フォルダを作り、さらにその lib フォルダ内に
 #    digest フォルダを作る。
@@ -21,7 +25,7 @@
 #
 # 4. DevKit をインストールしたフォルダ名を環境変数 DEVKIT_DIR に、ruby 1.9.2 を
 #    インストールしたフォルダ名を環境変数 RUBY_DIR に指定する。
-#    （RubyInstaller ならインストールせずに圧縮を解凍するだけでもよい）
+#    （RubyInstaller ならインストールせずに .7z を解凍するだけでもよい）
 #    環境変数が何か分からない人は調べるか、または rbconfig.rb を直接書き換える。
 #    そのとき、円記号区切りでなくスラッシュ区切りで書くことに注意。
 #    例: ENV["RUBY_DIR"] の部分を "C:/ruby-1.9.2" に、ENV["DEVKIT_DIR"] の部分を
