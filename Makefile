@@ -16,3 +16,8 @@ $(DLL) $(A): $(OBJS)
 	$(CC) $(LDFLAGS) -o $(DLL) $(OBJS) $(DEFS) $(LIBS)
 
 $(OBJS): rgss.h load_so.h
+
+pack: LoadSo.zip
+
+LoadSo.zip: msvcrt-ruby191.dll
+	zip LoadSo.zip msvcrt-ruby191.dll load_so.rb BSDL *.txt sample_rubyinline sample*.rb 
