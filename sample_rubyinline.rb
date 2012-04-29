@@ -1,5 +1,7 @@
 # encoding: utf-8
 # 準備：
+# 0. LoadSo を準備しておく。（README.txt を参考にしてください）
+#
 # 1. DevKit, ruby 1.9.2, RubyInline の inline.rb を用意する。それぞれ、
 #    http://rubyinstaller.org/downloads/ の「Development Kit」セクション、
 #    同上 URL の Ruby 1.9.2、
@@ -11,7 +13,11 @@
 #
 # 3. 用意した ruby から md5.so を digest フォルダに、digest.so, digest.rb, fileutils.rb,
 #    および sample_rubyinline フォルダ内のすべてのファイルを lib フォルダに。
-#    図示: Data/
+#    さらに、ruby 1.9.2 の bin フォルダから libeay32-1.0.0-msvcrt.dll を Game.exe と同じフォルダに。
+#    （RubyInstaller 以外の ruby を使っている場合、この DLL は不要だったり別名だったりするかもしれません）
+#    図示: Game.exe
+#          libeay32-1.0.0-msvcrt.dll
+#          Data/
 #           + lib/
 #              + digest/
 #              |  +- md5.so
@@ -31,6 +37,7 @@
 #    例: ENV["RUBY_DIR"] の部分を "C:/ruby-1.9.2" に、ENV["DEVKIT_DIR"] の部分を
 #        "C:/DevKit" に書き換える。
 #    注意: スペースを含むフォルダ名を使用しないでください。(C:/Program Files など)
+#          inline.rb の build メソッドを書き換えれば対応できるかもしれませんが未知数です。
 #
 # 5. ゲーム配布時などは、rbconfig.rb の ENV["RUBY_DIR"] および ENV["DEVKIT_DIR"]
 #    の部分は nil に書き換えるとコンパイルが行われなくなる。
@@ -38,7 +45,7 @@
 #    をする可能性があるので注意。
 #
 # 6. さらに言えば、ゲーム配布時は RubyInline で作られた .so ファイルを抜き出して
-#    （Data/.ruby_inline/ruby-1.9.2/ にあると思います）、require してやる方が
+#    （Data/.ruby_inline/ruby-1.9.2/ にあると思います）直接 require してやる方が
 #    不要なバグを生まないのでよい。工程 3. で用意したライブラリたちも含めなくてよくなる。
 
 require "inline"
